@@ -9,17 +9,18 @@ import net.minecraft.world.level.biome.Biome;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 @SuppressWarnings({"unused", "deprecation"})
-public class World {
+public class WorldAPI {
 
-    private static final org.bukkit.World DEFAULT_WORLD = Bukkit.getWorlds().get(0);
+    private static final World DEFAULT_WORLD = Bukkit.getWorlds().get(0);
 
     public static NamespacedKey getBiome(Location location) {
-        org.bukkit.World bukkitWorld = location.getWorld();
+        World bukkitWorld = location.getWorld();
         if (bukkitWorld == null) bukkitWorld = DEFAULT_WORLD;
 
         WorldGenLevel handle = getWorldGenLevel(bukkitWorld);
@@ -51,7 +52,7 @@ public class World {
         }
     }
 
-    private static WorldGenLevel getWorldGenLevel(org.bukkit.World world) {
+    private static WorldGenLevel getWorldGenLevel(World world) {
         try {
             return (WorldGenLevel) GET_HANDLE_METHOD.invoke(world);
         } catch (InvocationTargetException | IllegalAccessException e) {
