@@ -1,4 +1,4 @@
-package com.shanebeestudios.nms;
+package com.shanebeestudios.nms.plugin;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
