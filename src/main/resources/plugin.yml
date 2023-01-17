@@ -1,0 +1,3 @@
+name: NMS-API
+main: com.shanebeestudios.nms.NMSApi
+version: '${project.version}'
