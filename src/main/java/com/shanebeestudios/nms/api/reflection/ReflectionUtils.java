@@ -7,12 +7,21 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * Utility methods for simple use of reflection
+ */
 @SuppressWarnings("unused")
 public class ReflectionUtils {
 
     private static final String VERSION = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3] + ".";
     private static final boolean NEW_NMS = isRunningMinecraft(1, 17);
 
+    /**
+     * Get a class from the {@link org.bukkit.craftbukkit} package
+     *
+     * @param obcClassString Class name (including subpackages)
+     * @return Class object
+     */
     public static Class<?> getOBCClass(String obcClassString) {
         String name = "org.bukkit.craftbukkit." + VERSION + obcClassString;
         try {
@@ -23,6 +32,13 @@ public class ReflectionUtils {
         }
     }
 
+    /**
+     * Get an NMS (net.minecraft.server) class
+     *
+     * @param nmsClass   NMS class name
+     * @param nmsPackage vanilla MC mapped package
+     * @return Class object
+     */
     public static Class<?> getNMSClass(String nmsClass, String nmsPackage) {
         try {
             if (NEW_NMS) {
@@ -36,6 +52,12 @@ public class ReflectionUtils {
         }
     }
 
+    /**
+     * Get an NMS entity
+     *
+     * @param entity Bukkit entity to get NMS entity from
+     * @return NMS entity
+     */
     public static Object getNMSEntity(Entity entity) {
         try {
             Method getHandle = entity.getClass().getMethod("getHandle");
@@ -46,6 +68,14 @@ public class ReflectionUtils {
         }
     }
 
+    /**
+     * Get a field object
+     *
+     * @param field  Name of field
+     * @param clazz  Class containing field
+     * @param object Object to grab field from (null if static field)
+     * @return Field object from class
+     */
     public static Object getField(String field, Class<?> clazz, Object object) {
         try {
             Field f = clazz.getDeclaredField(field);
@@ -57,6 +87,14 @@ public class ReflectionUtils {
         }
     }
 
+    /**
+     * Set a field
+     *
+     * @param field  Name of field
+     * @param clazz  Class containing field
+     * @param object Object with field (null if static field)
+     * @param toSet  new value of field
+     */
     public static void setField(String field, Class<?> clazz, Object object, Object toSet) {
         try {
             Field f = clazz.getDeclaredField(field);
@@ -67,6 +105,13 @@ public class ReflectionUtils {
         }
     }
 
+    /**
+     * Set a field
+     *
+     * @param field  Name of field
+     * @param object Object with field (null if static field)
+     * @param toSet  new value of field
+     */
     public static void setField(String field, Object object, Object toSet) {
         try {
             Field f = object.getClass().getDeclaredField(field);

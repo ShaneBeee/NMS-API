@@ -4,6 +4,7 @@ import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import org.bukkit.Bukkit;
@@ -16,6 +17,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Api methods pertaining to a {@link World}
+ */
 @SuppressWarnings({"unused", "deprecation"})
 public class WorldApi {
 
@@ -64,6 +68,16 @@ public class WorldApi {
             keys.add(namespacedKey);
         });
         return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
+    }
+
+    /**
+     * Get an instance of ServerLevel from a {@link World Bukkit World}
+     *
+     * @param world World to get ServerLevel from
+     * @return ServerLevel from World
+     */
+    public static ServerLevel getServerLevel(World world) {
+        return ReflectionShortcuts.getServerLevel(world);
     }
 
 }

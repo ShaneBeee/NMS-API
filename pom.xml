@@ -21,12 +21,18 @@
     </repositories>
 
     <dependencies>
+        <!--suppress VulnerableLibrariesLocal -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
             <version>1.19.3-R0.1-SNAPSHOT</version>
             <classifier>remapped-mojang</classifier>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>24.0.0</version>
         </dependency>
     </dependencies>
 
@@ -41,7 +47,7 @@
                         <version>3.2.0</version>
                         <configuration>
                             <!-- Put here wherever you would like the plugin to build -->
-                            <outputDirectory>/Users/ShaneBee/Desktop/Server/Skript/1-19/plugins</outputDirectory>
+                            <outputDirectory>/Users/ShaneBee/Desktop/Server/Skript/1-19/plugins/skript-reflect</outputDirectory>
                         </configuration>
                     </plugin>
                 </plugins>
