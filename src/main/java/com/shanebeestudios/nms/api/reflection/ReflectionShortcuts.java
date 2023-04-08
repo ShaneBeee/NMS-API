@@ -2,6 +2,7 @@ package com.shanebeestudios.nms.api.reflection;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -31,7 +32,7 @@ public class ReflectionShortcuts {
             assert CRAFT_CHUNK_CLASS != null;
             CRAFT_WORLD_GET_HANDLE_METHOD = CRAFT_WORLD_CLASS.getMethod("getHandle");
             CRAFT_REGION_GET_HANDLE_METHOD = CRAFT_REGION_ACCESSOR_CLASS.getMethod("getHandle");
-            CRAFT_CHUNK_GET_HANDLE_METHOD = CRAFT_CHUNK_CLASS.getMethod("getHandle");
+            CRAFT_CHUNK_GET_HANDLE_METHOD = CRAFT_CHUNK_CLASS.getMethod("getHandle", ChunkStatus.class);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -67,7 +68,7 @@ public class ReflectionShortcuts {
 
     public static LevelChunk getLevelChunk(Chunk chunk) {
         try {
-            return (LevelChunk) CRAFT_CHUNK_GET_HANDLE_METHOD.invoke(chunk);
+            return (LevelChunk) CRAFT_CHUNK_GET_HANDLE_METHOD.invoke(chunk, ChunkStatus.FULL);
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
