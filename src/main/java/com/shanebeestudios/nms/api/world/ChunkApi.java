@@ -3,7 +3,6 @@ package com.shanebeestudios.nms.api.world;
 import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
@@ -40,8 +39,8 @@ public class ChunkApi {
         ChunkMap chunkMap = level.getChunkSource().chunkMap;
 
         List<Player> players = new ArrayList<>();
-        List<ServerPlayer> chunkMapPlayers = chunkMap.getPlayers(levelChunk.getPos(), false);
-        chunkMapPlayers.forEach(serverPlayer -> players.add(serverPlayer.getBukkitEntity()));
+        chunkMap.getPlayers(levelChunk.getPos(), false)
+                .forEach(serverPlayer -> players.add(serverPlayer.getBukkitEntity()));
         return players;
     }
 
