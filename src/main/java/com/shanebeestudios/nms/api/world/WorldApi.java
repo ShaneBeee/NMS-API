@@ -1,12 +1,16 @@
 package com.shanebeestudios.nms.api.world;
 
 import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -50,6 +54,32 @@ public class WorldApi {
             key = new ResourceLocation("minecraft", "plains");
         }
         return new NamespacedKey(key.getNamespace(), key.getPath());
+    }
+
+    /**
+     * Set a biome at a location, including custom biomes.
+     *
+     * @param location      Location of biome to change
+     * @param namespacedKey Key of biome
+     */
+    public static void setBiome(Location location, NamespacedKey namespacedKey) {
+        World bukkitWorld = location.getWorld();
+        if (bukkitWorld == null) bukkitWorld = DEFAULT_WORLD;
+
+        WorldGenLevel worldGenLevel = ReflectionShortcuts.getWorldGenLevel(bukkitWorld);
+
+        int x = location.getBlockX();
+        int y = location.getBlockY();
+        int z = location.getBlockZ();
+
+        Registry<Biome> biomeRegistry = worldGenLevel.registryAccess().registryOrThrow(Registries.BIOME);
+        ResourceLocation resourceLocation = new ResourceLocation(namespacedKey.getNamespace(), namespacedKey.getKey());
+        ResourceKey<Biome> biomeResourceKey = ResourceKey.create(Registries.BIOME, resourceLocation);
+        Holder.Reference<Biome> biome = biomeRegistry.getHolderOrThrow(biomeResourceKey);
+
+        LevelChunk chunk = worldGenLevel.getMinecraftWorld().getChunkAt(new BlockPos(x, y, z));
+        chunk.setBiome(x >> 2, y >> 2, z >> 2, biome);
+        chunk.setUnsaved(true);
     }
 
     /**
