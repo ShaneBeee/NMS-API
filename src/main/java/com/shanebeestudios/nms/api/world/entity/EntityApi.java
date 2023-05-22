@@ -1,6 +1,6 @@
 package com.shanebeestudios.nms.api.world.entity;
 
-import com.shanebeestudios.nms.api.reflection.ReflectionUtils;
+import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -34,7 +34,7 @@ public class EntityApi {
      * @return NMS Entity
      */
     public static Entity getNMSEntity(org.bukkit.entity.Entity bukkitEntity) {
-        return (Entity) ReflectionUtils.getNMSEntity(bukkitEntity);
+        return ReflectionShortcuts.getNMSEntity(bukkitEntity);
     }
 
     /**

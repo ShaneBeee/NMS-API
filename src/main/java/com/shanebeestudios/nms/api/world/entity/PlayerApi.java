@@ -1,7 +1,7 @@
 package com.shanebeestudios.nms.api.world.entity;
 
 import com.mojang.authlib.GameProfile;
-import com.shanebeestudios.nms.api.reflection.ReflectionUtils;
+import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import com.shanebeestudios.nms.api.world.WorldApi;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.MinecraftServer;
@@ -73,8 +73,8 @@ public class PlayerApi {
      */
     @Nullable
     public static ServerGamePacketListenerImpl getPlayerConnection(@NotNull Player player) {
-        Object nmsEntity = ReflectionUtils.getNMSEntity(player);
-        if (nmsEntity instanceof ServerPlayer serverPlayer) {
+        net.minecraft.world.entity.player.Player nmsPlayer = ReflectionShortcuts.getNMSPlayer(player);
+        if (nmsPlayer instanceof ServerPlayer serverPlayer) {
             return serverPlayer.connection;
         }
         return null;

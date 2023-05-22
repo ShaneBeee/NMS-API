@@ -1,11 +1,8 @@
 package com.shanebeestudios.nms.api.reflection;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * Utility methods for simple use of reflection
@@ -47,22 +44,6 @@ public class ReflectionUtils {
                 return Class.forName("net.minecraft.server." + VERSION + nmsClass);
             }
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * Get an NMS entity
-     *
-     * @param entity Bukkit entity to get NMS entity from
-     * @return NMS entity
-     */
-    public static Object getNMSEntity(Entity entity) {
-        try {
-            Method getHandle = entity.getClass().getMethod("getHandle");
-            return getHandle.invoke(entity);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             return null;
         }

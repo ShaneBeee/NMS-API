@@ -6,6 +6,9 @@ import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -72,6 +75,38 @@ public class ReflectionShortcuts {
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Get an NMS entity
+     *
+     * @param entity Bukkit entity to get NMS entity from
+     * @return NMS entity
+     */
+    @Nullable
+    public static net.minecraft.world.entity.Entity getNMSEntity(Entity entity) {
+        try {
+            Method getHandle = entity.getClass().getMethod("getHandle");
+            Object invoke = getHandle.invoke(entity);
+            if (invoke instanceof net.minecraft.world.entity.Entity entity1) return entity1;
+            return null;
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Get an NMS player
+     *
+     * @param player Bukkit player to get NMS player from
+     * @return NMS player
+     */
+    @Nullable
+    public static net.minecraft.world.entity.player.Player getNMSPlayer(Player player) {
+        net.minecraft.world.entity.Entity nmsEntity = getNMSEntity(player);
+        if (nmsEntity instanceof net.minecraft.world.entity.player.Player player1) return player1;
+        return null;
     }
 
 }
