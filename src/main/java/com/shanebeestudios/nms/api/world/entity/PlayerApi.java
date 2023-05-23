@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -91,6 +92,33 @@ public class PlayerApi {
         if (playerConnection != null) {
             playerConnection.send(packet);
         }
+    }
+
+    /**
+     * Start the riptide animation for a player
+     *
+     * @param player Player to riptide
+     * @param time   Ticks to riptide
+     */
+    public static void riptide(Player player, int time) {
+        net.minecraft.world.entity.player.Player nmsPlayer = ReflectionShortcuts.getNMSPlayer(player);
+        if (nmsPlayer == null) return;
+        nmsPlayer.startAutoSpinAttack(time);
+    }
+
+    /**
+     * Make a player touch an entity
+     * <p>This only works on a few entities, ex: touching a dropped item makes the player pick it up</p>
+     *
+     * @param player Player to do the touching
+     * @param entity Entity to touch
+     */
+    public static void touch(Player player, Entity entity) {
+        net.minecraft.world.entity.player.Player nmsPlayer = ReflectionShortcuts.getNMSPlayer(player);
+        net.minecraft.world.entity.Entity nmsEntity = ReflectionShortcuts.getNMSEntity(entity);
+
+        if (nmsPlayer == null || nmsEntity == null) return;
+        nmsEntity.playerTouch(nmsPlayer);
     }
 
 }
