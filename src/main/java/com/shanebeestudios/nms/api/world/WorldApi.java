@@ -1,13 +1,13 @@
 package com.shanebeestudios.nms.api.world;
 
 import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
+import com.shanebeestudios.nms.api.util.RegistryUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
@@ -31,8 +31,9 @@ import java.util.stream.Collectors;
 public class WorldApi {
 
     private static final World DEFAULT_WORLD = Bukkit.getWorlds().get(0);
-    private static final Registry<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE_REGISTRY = MinecraftServer.getServer().registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE);
-    private static final Registry<PlacedFeature> PLACED_FEATURE_REGISTRY = MinecraftServer.getServer().registryAccess().registryOrThrow(Registries.PLACED_FEATURE);
+    private static final Registry<Biome> BIOME_REGISTRY = RegistryUtils.getRegistry(Registries.BIOME);
+    private static final Registry<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE_REGISTRY = RegistryUtils.getRegistry(Registries.CONFIGURED_FEATURE);
+    private static final Registry<PlacedFeature> PLACED_FEATURE_REGISTRY = RegistryUtils.getRegistry(Registries.PLACED_FEATURE);
 
 
     /**
@@ -78,10 +79,9 @@ public class WorldApi {
         int y = location.getBlockY();
         int z = location.getBlockZ();
 
-        Registry<Biome> biomeRegistry = worldGenLevel.registryAccess().registryOrThrow(Registries.BIOME);
         ResourceLocation resourceLocation = new ResourceLocation(namespacedKey.getNamespace(), namespacedKey.getKey());
         ResourceKey<Biome> biomeResourceKey = ResourceKey.create(Registries.BIOME, resourceLocation);
-        Holder.Reference<Biome> biome = biomeRegistry.getHolderOrThrow(biomeResourceKey);
+        Holder.Reference<Biome> biome = BIOME_REGISTRY.getHolderOrThrow(biomeResourceKey);
 
         LevelChunk chunk = worldGenLevel.getMinecraftWorld().getChunkAt(new BlockPos(x, y, z));
         chunk.setBiome(x >> 2, y >> 2, z >> 2, biome);
@@ -96,10 +96,9 @@ public class WorldApi {
      */
     public static List<NamespacedKey> getBiomeKeys() {
         WorldGenLevel worldGenLevel = ReflectionShortcuts.getWorldGenLevel(DEFAULT_WORLD);
-        Registry<Biome> biomeRegistry = worldGenLevel.registryAccess().registryOrThrow(Registries.BIOME);
 
         List<NamespacedKey> keys = new ArrayList<>();
-        biomeRegistry.keySet().forEach(resourceLocation -> {
+        BIOME_REGISTRY.keySet().forEach(resourceLocation -> {
             NamespacedKey namespacedKey = new NamespacedKey(resourceLocation.getNamespace(), resourceLocation.getPath());
             keys.add(namespacedKey);
         });
