@@ -7,10 +7,13 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -28,6 +31,9 @@ import java.util.stream.Collectors;
 public class WorldApi {
 
     private static final World DEFAULT_WORLD = Bukkit.getWorlds().get(0);
+    private static final Registry<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE_REGISTRY = MinecraftServer.getServer().registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE);
+    private static final Registry<PlacedFeature> PLACED_FEATURE_REGISTRY = MinecraftServer.getServer().registryAccess().registryOrThrow(Registries.PLACED_FEATURE);
+
 
     /**
      * Get the {@link NamespacedKey} of a {@link org.bukkit.block.Biome} at a specific location.
@@ -108,6 +114,76 @@ public class WorldApi {
      */
     public static ServerLevel getServerLevel(World world) {
         return ReflectionShortcuts.getServerLevel(world);
+    }
+
+    /**
+     * Place a configured feature
+     *
+     * @param featureKey Key of feature to place
+     * @param location   Location to place at
+     * @return True if feature was placed, otherwise false if failed
+     */
+    public static boolean placeConfiguredFeature(NamespacedKey featureKey, Location location) {
+        World bukkitWorld = location.getWorld() == null ? DEFAULT_WORLD : location.getWorld();
+        WorldGenLevel worldGenLevel = ReflectionShortcuts.getWorldGenLevel(bukkitWorld);
+        ServerLevel serverLevel = worldGenLevel.getLevel();
+        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
+        ResourceLocation featureLocation = new ResourceLocation(featureKey.getNamespace(), featureKey.getKey());
+
+        ResourceKey<ConfiguredFeature<?, ?>> placedFeatureResourceKey = ResourceKey.create(CONFIGURED_FEATURE_REGISTRY.key(), featureLocation);
+        Holder.Reference<ConfiguredFeature<?, ?>> placedFeatureHolder = CONFIGURED_FEATURE_REGISTRY.getHolderOrThrow(placedFeatureResourceKey);
+        ConfiguredFeature<?, ?> configuredFeature = placedFeatureHolder.value();
+        return configuredFeature.place(worldGenLevel, serverLevel.getChunkSource().getGenerator(), serverLevel.getRandom(), blockPos);
+    }
+
+    /**
+     * Place a placed feature
+     *
+     * @param featureKey Key of feature to place
+     * @param location   Location to place at
+     * @return True if feature was placed, otherwise false if failed
+     */
+    public static boolean placePlacedFeature(NamespacedKey featureKey, Location location) {
+        World bukkitWorld = location.getWorld() == null ? DEFAULT_WORLD : location.getWorld();
+        WorldGenLevel worldGenLevel = ReflectionShortcuts.getWorldGenLevel(bukkitWorld);
+        ServerLevel serverLevel = worldGenLevel.getLevel();
+        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
+        ResourceLocation featureLocation = new ResourceLocation(featureKey.getNamespace(), featureKey.getKey());
+
+        ResourceKey<PlacedFeature> placedFeatureResourceKey = ResourceKey.create(PLACED_FEATURE_REGISTRY.key(), featureLocation);
+        Holder.Reference<PlacedFeature> placedFeatureHolder = PLACED_FEATURE_REGISTRY.getHolderOrThrow(placedFeatureResourceKey);
+        PlacedFeature placedFeature = placedFeatureHolder.value();
+        return placedFeature.placeWithBiomeCheck(worldGenLevel, serverLevel.getChunkSource().getGenerator(), serverLevel.getRandom(), blockPos);
+    }
+
+    /**
+     * Get a list of all registered configured features
+     *
+     * @return List of all registered configured features
+     */
+    public static List<NamespacedKey> getConfiguredFeatures() {
+        List<NamespacedKey> keys = new ArrayList<>();
+        CONFIGURED_FEATURE_REGISTRY.keySet().forEach(resourceLocation -> {
+            NamespacedKey namespacedKey = new NamespacedKey(resourceLocation.getNamespace(), resourceLocation.getPath());
+            keys.add(namespacedKey);
+        });
+        return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
+    }
+
+    /**
+     * Get a list of all registered placed features
+     *
+     * @return List of all registered placed features
+     */
+    public static List<NamespacedKey> getPlacedFeatures() {
+        List<NamespacedKey> keys = new ArrayList<>();
+        PLACED_FEATURE_REGISTRY.keySet().forEach(resourceLocation -> {
+            NamespacedKey namespacedKey = new NamespacedKey(resourceLocation.getNamespace(), resourceLocation.getPath());
+            keys.add(namespacedKey);
+        });
+        return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
     }
 
 }
