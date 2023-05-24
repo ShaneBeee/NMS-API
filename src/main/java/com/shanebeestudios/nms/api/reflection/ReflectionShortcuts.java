@@ -4,6 +4,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -18,6 +19,7 @@ import java.lang.reflect.Method;
  */
 public class ReflectionShortcuts {
 
+    private static final World DEFAULT_WORLD = Bukkit.getWorlds().get(0);
     private static final Class<?> CRAFT_WORLD_CLASS;
     private static final Method CRAFT_WORLD_GET_HANDLE_METHOD;
     private static final Class<?> CRAFT_REGION_ACCESSOR_CLASS;
@@ -56,28 +58,15 @@ public class ReflectionShortcuts {
     }
 
     /**
-     * Get an instance of a ServerLevel from a {@link World Bukkit World}
-     *
-     * @param world Bukkit world to get Minecraft ServerLevel from
-     * @return Minecraft ServerLevel from Bukkit world
-     */
-    public static ServerLevel getLevel(World world) {
-        try {
-            return (ServerLevel) CRAFT_WORLD_GET_HANDLE_METHOD.invoke(world);
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
      * Get an instance of ServerLevel from a {@link World Bukkit World}
      *
      * @param world World to get ServerLevel from
      * @return ServerLevel from World
      */
     public static ServerLevel getServerLevel(World world) {
+        World bukkitWorld = world != null ? world : DEFAULT_WORLD;
         try {
-            return (ServerLevel) CRAFT_WORLD_GET_HANDLE_METHOD.invoke(world);
+            return (ServerLevel) CRAFT_WORLD_GET_HANDLE_METHOD.invoke(bukkitWorld);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
