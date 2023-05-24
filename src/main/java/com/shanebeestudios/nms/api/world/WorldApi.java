@@ -1,6 +1,8 @@
 package com.shanebeestudios.nms.api.world;
 
+import com.mojang.datafixers.util.Pair;
 import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
+import com.shanebeestudios.nms.api.util.McUtils;
 import com.shanebeestudios.nms.api.util.RegistryUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -86,6 +88,39 @@ public class WorldApi {
         LevelChunk chunk = worldGenLevel.getMinecraftWorld().getChunkAt(new BlockPos(x, y, z));
         chunk.setBiome(x >> 2, y >> 2, z >> 2, biome);
         chunk.setUnsaved(true);
+    }
+
+    /**
+     * Locate a biome in a radius of a location
+     * <p>Defaults to 6400 radius with 8 steps</p>
+     *
+     * @param biomeKey NamespacedKey of biome to find
+     * @param center   Where to look from
+     * @return Location if a biome is found, null otherwise
+     */
+    public static Location locateBiome(NamespacedKey biomeKey, Location center) {
+        return locateBiome(biomeKey, center, 6400, 8);
+    }
+
+    /**
+     * Locate a biome in a radius of a location
+     *
+     * @param biomeKey NamespacedKey of biome to find
+     * @param center   Where to look from
+     * @param radius   Max radius to search
+     * @param step     How many blocks to check in steps
+     * @return Location if a biome is found, null otherwise
+     */
+    public static Location locateBiome(NamespacedKey biomeKey, Location center, int radius, int step) {
+        BlockPos blockPos = McUtils.locationToPos(center);
+        ServerLevel level = getServerLevel(center.getWorld());
+        ResourceLocation resourceLocation = McUtils.getResourceLocation(biomeKey);
+        Pair<BlockPos, Holder<Biome>> closestBiome3d = level.findClosestBiome3d(holder ->
+                holder.is(resourceLocation), blockPos, radius, step, 64);
+
+        if (closestBiome3d == null) return null;
+        BlockPos biomePos = closestBiome3d.getFirst();
+        return McUtils.posToLocation(biomePos, level);
     }
 
     /**
