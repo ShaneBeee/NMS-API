@@ -2,7 +2,7 @@ package com.shanebeestudios.nms.api.world.entity;
 
 import com.mojang.authlib.GameProfile;
 import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
-import com.shanebeestudios.nms.api.world.WorldApi;
+import com.shanebeestudios.nms.api.util.McUtils;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -39,7 +39,7 @@ public class PlayerApi {
      */
     public static FakePlayer spawnFakePlayer(String name, Location loc) {
         World world = loc.getWorld() != null ? loc.getWorld() : Bukkit.getWorlds().get(0);
-        ServerLevel level = WorldApi.getServerLevel(world);
+        ServerLevel level = McUtils.getServerLevel(world);
 
         OfflinePlayer op = Bukkit.getOfflinePlayer(name);
         ServerPlayer serverPlayer = new ServerPlayer(MINECRAFT_SERVER, level, new GameProfile(op.getUniqueId(), name));

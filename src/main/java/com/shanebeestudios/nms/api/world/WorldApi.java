@@ -112,15 +112,15 @@ public class WorldApi {
      * @return Location if a biome is found, null otherwise
      */
     public static Location locateBiome(NamespacedKey biomeKey, Location center, int radius, int step) {
-        BlockPos blockPos = McUtils.locationToPos(center);
-        ServerLevel level = getServerLevel(center.getWorld());
+        BlockPos blockPos = McUtils.getPos(center);
+        ServerLevel level = McUtils.getServerLevel(center.getWorld());
         ResourceLocation resourceLocation = McUtils.getResourceLocation(biomeKey);
         Pair<BlockPos, Holder<Biome>> closestBiome3d = level.findClosestBiome3d(holder ->
                 holder.is(resourceLocation), blockPos, radius, step, 64);
 
         if (closestBiome3d == null) return null;
         BlockPos biomePos = closestBiome3d.getFirst();
-        return McUtils.posToLocation(biomePos, level);
+        return McUtils.getLocation(biomePos, level);
     }
 
     /**
@@ -138,16 +138,6 @@ public class WorldApi {
             keys.add(namespacedKey);
         });
         return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
-    }
-
-    /**
-     * Get an instance of ServerLevel from a {@link World Bukkit World}
-     *
-     * @param world World to get ServerLevel from
-     * @return ServerLevel from World
-     */
-    public static ServerLevel getServerLevel(World world) {
-        return ReflectionShortcuts.getServerLevel(world);
     }
 
     /**
