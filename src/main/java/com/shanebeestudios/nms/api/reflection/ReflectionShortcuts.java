@@ -56,6 +56,20 @@ public class ReflectionShortcuts {
     }
 
     /**
+     * Get an instance of a ServerLevel from a {@link World Bukkit World}
+     *
+     * @param world Bukkit world to get Minecraft ServerLevel from
+     * @return Minecraft ServerLevel from Bukkit world
+     */
+    public static ServerLevel getLevel(World world) {
+        try {
+            return (ServerLevel) CRAFT_WORLD_GET_HANDLE_METHOD.invoke(world);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Get an instance of ServerLevel from a {@link World Bukkit World}
      *
      * @param world World to get ServerLevel from
