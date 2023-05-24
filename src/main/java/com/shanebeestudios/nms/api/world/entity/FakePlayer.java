@@ -44,4 +44,9 @@ public class FakePlayer {
         return new Vec3(location.getX(), location.getY(), location.getZ());
     }
 
+    @Override
+    public String toString() {
+        return "FakePlayer{name='" + this.serverPlayer.getGameProfile().getName() + "'}";
+    }
+
 }
