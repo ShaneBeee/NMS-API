@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.WorldGenLevel;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -63,6 +64,16 @@ public class McUtils {
      * @return ServerLevel from World
      */
     public static ServerLevel getServerLevel(World world) {
+        return ReflectionShortcuts.getServerLevel(world);
+    }
+
+    /**
+     * Get an instance of WorldGenLevel from a {@link World Bukkit World}
+     *
+     * @param world Bukkit world to get WorldGenLevel from
+     * @return WorldGenLevel from Bukkit world
+     */
+    public static WorldGenLevel getWorldGenLevel(World world) {
         return ReflectionShortcuts.getServerLevel(world);
     }
 
