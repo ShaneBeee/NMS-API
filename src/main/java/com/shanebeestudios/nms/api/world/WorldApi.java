@@ -10,7 +10,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -39,6 +38,32 @@ public class WorldApi {
     private static final Registry<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE_REGISTRY = McUtils.getRegistry(Registries.CONFIGURED_FEATURE);
     private static final Registry<PlacedFeature> PLACED_FEATURE_REGISTRY = McUtils.getRegistry(Registries.PLACED_FEATURE);
     private static final Registry<Structure> STRUCTURE_REGISTRY = McUtils.getRegistry(Registries.STRUCTURE);
+
+    @Nullable
+    private static <T> Holder.Reference<T> getHolderReference(Registry<T> registry, NamespacedKey key) {
+        ResourceLocation resourceLocation = McUtils.getResourceLocation(key);
+        ResourceKey<T> resourceKey = ResourceKey.create(registry.key(), resourceLocation);
+        try {
+            return registry.getHolderOrThrow(resourceKey);
+        } catch (IllegalStateException ignore) {
+            return null;
+        }
+    }
+
+    @Nullable
+    private static <T> T getRegistryValue(Registry<T> registry, NamespacedKey key) {
+        Holder.Reference<T> holderReference = getHolderReference(registry, key);
+        return holderReference != null ? holderReference.value() : null;
+    }
+
+    private static <T> List<NamespacedKey> getRegistryKeys(Registry<T> registry) {
+        List<NamespacedKey> keys = new ArrayList<>();
+        registry.keySet().forEach(resourceLocation -> {
+            NamespacedKey namespacedKey = McUtils.getNamespacedKey(resourceLocation);
+            keys.add(namespacedKey);
+        });
+        return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
+    }
 
 
     /**
@@ -79,14 +104,11 @@ public class WorldApi {
         if (bukkitWorld == null) bukkitWorld = DEFAULT_WORLD;
 
         ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
+        Holder.Reference<Biome> biome = getHolderReference(BIOME_REGISTRY, biomeKey);
 
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();
-
-        ResourceLocation resourceLocation = McUtils.getResourceLocation(biomeKey);
-        ResourceKey<Biome> biomeResourceKey = ResourceKey.create(Registries.BIOME, resourceLocation);
-        Holder.Reference<Biome> biome = BIOME_REGISTRY.getHolderOrThrow(biomeResourceKey);
 
         LevelChunk chunk = serverLevel.getChunkAt(new BlockPos(x, y, z));
         chunk.setBiome(x >> 2, y >> 2, z >> 2, biome);
@@ -136,14 +158,7 @@ public class WorldApi {
      */
     @NotNull
     public static List<NamespacedKey> getBiomeKeys() {
-        WorldGenLevel worldGenLevel = McUtils.getWorldGenLevel(DEFAULT_WORLD);
-
-        List<NamespacedKey> keys = new ArrayList<>();
-        BIOME_REGISTRY.keySet().forEach(resourceLocation -> {
-            NamespacedKey namespacedKey = McUtils.getNamespacedKey(resourceLocation);
-            keys.add(namespacedKey);
-        });
-        return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
+        return getRegistryKeys(BIOME_REGISTRY);
     }
 
     /**
@@ -158,11 +173,11 @@ public class WorldApi {
         ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
         BlockPos blockPos = McUtils.getPos(location);
 
-        ResourceLocation featureLocation = McUtils.getResourceLocation(featureKey);
-        ResourceKey<ConfiguredFeature<?, ?>> configuredFeatureResourceKey = ResourceKey.create(CONFIGURED_FEATURE_REGISTRY.key(), featureLocation);
-        Holder.Reference<ConfiguredFeature<?, ?>> configuredFeatureHolder = CONFIGURED_FEATURE_REGISTRY.getHolderOrThrow(configuredFeatureResourceKey);
-        ConfiguredFeature<?, ?> configuredFeature = configuredFeatureHolder.value();
-        return configuredFeature.place(serverLevel, serverLevel.getChunkSource().getGenerator(), serverLevel.getRandom(), blockPos);
+        ConfiguredFeature<?, ?> configuredFeature = getRegistryValue(CONFIGURED_FEATURE_REGISTRY, featureKey);
+        if (configuredFeature != null) {
+            return configuredFeature.place(serverLevel, serverLevel.getChunkSource().getGenerator(), serverLevel.getRandom(), blockPos);
+        }
+        return false;
     }
 
     /**
@@ -177,11 +192,11 @@ public class WorldApi {
         ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
         BlockPos blockPos = McUtils.getPos(location);
 
-        ResourceLocation featureLocation = McUtils.getResourceLocation(featureKey);
-        ResourceKey<PlacedFeature> placedFeatureResourceKey = ResourceKey.create(PLACED_FEATURE_REGISTRY.key(), featureLocation);
-        Holder.Reference<PlacedFeature> placedFeatureHolder = PLACED_FEATURE_REGISTRY.getHolderOrThrow(placedFeatureResourceKey);
-        PlacedFeature placedFeature = placedFeatureHolder.value();
-        return placedFeature.placeWithBiomeCheck(serverLevel, serverLevel.getChunkSource().getGenerator(), serverLevel.getRandom(), blockPos);
+        PlacedFeature placedFeature = getRegistryValue(PLACED_FEATURE_REGISTRY, featureKey);
+        if (placedFeature != null) {
+            return placedFeature.placeWithBiomeCheck(serverLevel, serverLevel.getChunkSource().getGenerator(), serverLevel.getRandom(), blockPos);
+        }
+        return false;
     }
 
     /**
@@ -190,13 +205,13 @@ public class WorldApi {
      * placed in a world, such as a village.
      * Will default to a radius of 6400 and true for findUnexplored.</p>
      *
-     * @param key      Key of structure to find
-     * @param location Location to center search from
+     * @param structureKey Key of structure to find
+     * @param location     Location to center search from
      * @return Location of structure if found, otherwise null
      */
     @Nullable
-    public static Location locateNearestStructure(@NotNull NamespacedKey key, @NotNull Location location) {
-        return locateNearestStructure(key, location, 6400, true);
+    public static Location locateNearestStructure(@NotNull NamespacedKey structureKey, @NotNull Location location) {
+        return locateNearestStructure(structureKey, location, 6400, true);
     }
 
     /**
@@ -204,26 +219,25 @@ public class WorldApi {
      * <p>This does not mean a StructureBlock Structure, this means a structure
      * placed in a world, such as a village.</p>
      *
-     * @param key            Key of structure to find
+     * @param structureKey   Key of structure to find
      * @param location       Location to center search from
      * @param radius         Max radius to search in
      * @param findUnexplored Whether to look for structures that haven't generated yet
      * @return Location of structure if found, otherwise null
      */
     @Nullable
-    public static Location locateNearestStructure(@NotNull NamespacedKey key, @NotNull Location location, int radius, boolean findUnexplored) {
+    public static Location locateNearestStructure(@NotNull NamespacedKey structureKey, @NotNull Location location, int radius, boolean findUnexplored) {
         World bukkitWorld = location.getWorld() == null ? DEFAULT_WORLD : location.getWorld();
         ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
         BlockPos blockPos = McUtils.getPos(location);
 
-        ResourceLocation featureLocation = McUtils.getResourceLocation(key);
-        ResourceKey<Structure> structureResourceKey = ResourceKey.create(STRUCTURE_REGISTRY.key(), featureLocation);
-        Holder.Reference<Structure> structureHolder = STRUCTURE_REGISTRY.getHolderOrThrow(structureResourceKey);
-
-        Pair<BlockPos, Holder<Structure>> nearestMapStructure = serverLevel.getChunkSource().getGenerator()
-                .findNearestMapStructure(serverLevel, HolderSet.direct(structureHolder), blockPos, radius, findUnexplored);
-        if (nearestMapStructure != null) {
-            return McUtils.getLocation(nearestMapStructure.getFirst(), serverLevel);
+        Holder.Reference<Structure> structureHolder = getHolderReference(STRUCTURE_REGISTRY, structureKey);
+        if (structureHolder != null) {
+            Pair<BlockPos, Holder<Structure>> nearestMapStructure = serverLevel.getChunkSource().getGenerator()
+                    .findNearestMapStructure(serverLevel, HolderSet.direct(structureHolder), blockPos, radius, findUnexplored);
+            if (nearestMapStructure != null) {
+                return McUtils.getLocation(nearestMapStructure.getFirst(), serverLevel);
+            }
         }
         return null;
     }
@@ -235,12 +249,7 @@ public class WorldApi {
      */
     @NotNull
     public static List<NamespacedKey> getConfiguredFeatures() {
-        List<NamespacedKey> keys = new ArrayList<>();
-        CONFIGURED_FEATURE_REGISTRY.keySet().forEach(resourceLocation -> {
-            NamespacedKey namespacedKey = McUtils.getNamespacedKey(resourceLocation);
-            keys.add(namespacedKey);
-        });
-        return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
+        return getRegistryKeys(CONFIGURED_FEATURE_REGISTRY);
     }
 
     /**
@@ -250,12 +259,7 @@ public class WorldApi {
      */
     @NotNull
     public static List<NamespacedKey> getPlacedFeatures() {
-        List<NamespacedKey> keys = new ArrayList<>();
-        PLACED_FEATURE_REGISTRY.keySet().forEach(resourceLocation -> {
-            NamespacedKey namespacedKey = McUtils.getNamespacedKey(resourceLocation);
-            keys.add(namespacedKey);
-        });
-        return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
+        return getRegistryKeys(PLACED_FEATURE_REGISTRY);
     }
 
     /**
@@ -267,12 +271,7 @@ public class WorldApi {
      */
     @NotNull
     public static List<NamespacedKey> getStructures() {
-        List<NamespacedKey> keys = new ArrayList<>();
-        STRUCTURE_REGISTRY.keySet().forEach(resourceLocation -> {
-            NamespacedKey namespacedKey = McUtils.getNamespacedKey(resourceLocation);
-            keys.add(namespacedKey);
-        });
-        return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
+        return getRegistryKeys(STRUCTURE_REGISTRY);
     }
 
 }
