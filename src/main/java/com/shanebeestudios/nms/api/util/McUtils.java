@@ -2,7 +2,10 @@ package com.shanebeestudios.nms.api.util;
 
 import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
@@ -75,6 +78,18 @@ public class McUtils {
      */
     public static WorldGenLevel getWorldGenLevel(World world) {
         return ReflectionShortcuts.getServerLevel(world);
+    }
+
+    /**
+     * Get a Minecraft Registry
+     *
+     * @param registry ResourceKey of registry
+     * @param <T>      ResourceKey
+     * @return Registry from key
+     */
+    @SuppressWarnings("deprecation")
+    public static <T> Registry<T> getRegistry(ResourceKey<? extends Registry<? extends T>> registry) {
+        return MinecraftServer.getServer().registryAccess().registryOrThrow(registry);
     }
 
 }
