@@ -1,9 +1,7 @@
 package com.shanebeestudios.nms.api.world;
 
 import com.mojang.datafixers.util.Pair;
-import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import com.shanebeestudios.nms.api.util.McUtils;
-import com.shanebeestudios.nms.api.util.RegistryUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -22,6 +20,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,14 +31,14 @@ import java.util.stream.Collectors;
 /**
  * Api methods pertaining to a {@link World}
  */
-@SuppressWarnings({"unused", "deprecation"})
+@SuppressWarnings({"unused"})
 public class WorldApi {
 
     private static final World DEFAULT_WORLD = Bukkit.getWorlds().get(0);
-    private static final Registry<Biome> BIOME_REGISTRY = RegistryUtils.getRegistry(Registries.BIOME);
-    private static final Registry<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE_REGISTRY = RegistryUtils.getRegistry(Registries.CONFIGURED_FEATURE);
-    private static final Registry<PlacedFeature> PLACED_FEATURE_REGISTRY = RegistryUtils.getRegistry(Registries.PLACED_FEATURE);
-    private static final Registry<Structure> STRUCTURE_REGISTRY = RegistryUtils.getRegistry(Registries.STRUCTURE);
+    private static final Registry<Biome> BIOME_REGISTRY = McUtils.getRegistry(Registries.BIOME);
+    private static final Registry<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE_REGISTRY = McUtils.getRegistry(Registries.CONFIGURED_FEATURE);
+    private static final Registry<PlacedFeature> PLACED_FEATURE_REGISTRY = McUtils.getRegistry(Registries.PLACED_FEATURE);
+    private static final Registry<Structure> STRUCTURE_REGISTRY = McUtils.getRegistry(Registries.STRUCTURE);
 
 
     /**
@@ -48,47 +48,47 @@ public class WorldApi {
      * @param location Location to grab biome at
      * @return Key of biome
      */
-    public static NamespacedKey getBiome(Location location) {
+    @NotNull
+    public static NamespacedKey getBiome(@NotNull Location location) {
         World bukkitWorld = location.getWorld();
         if (bukkitWorld == null) bukkitWorld = DEFAULT_WORLD;
 
-        WorldGenLevel worldGenLevel = ReflectionShortcuts.getWorldGenLevel(bukkitWorld);
+        ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
 
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();
 
-        Registry<Biome> biomeRegistry = worldGenLevel.registryAccess().registryOrThrow(Registries.BIOME);
-        Biome biome = worldGenLevel.getNoiseBiome(x >> 2, y >> 2, z >> 2).value();
-        ResourceLocation key = biomeRegistry.getKey(biome);
+        Biome biome = serverLevel.getNoiseBiome(x >> 2, y >> 2, z >> 2).value();
+        ResourceLocation key = BIOME_REGISTRY.getKey(biome);
         if (key == null) {
             // This shouldn't happen, but safety feature
             key = new ResourceLocation("minecraft", "plains");
         }
-        return new NamespacedKey(key.getNamespace(), key.getPath());
+        return McUtils.getNamespacedKey(key);
     }
 
     /**
      * Set a biome at a location, including custom biomes.
      *
-     * @param location      Location of biome to change
-     * @param namespacedKey Key of biome
+     * @param location Location of biome to change
+     * @param biomeKey Key of biome
      */
-    public static void setBiome(Location location, NamespacedKey namespacedKey) {
+    public static void setBiome(@NotNull Location location, @NotNull NamespacedKey biomeKey) {
         World bukkitWorld = location.getWorld();
         if (bukkitWorld == null) bukkitWorld = DEFAULT_WORLD;
 
-        WorldGenLevel worldGenLevel = ReflectionShortcuts.getWorldGenLevel(bukkitWorld);
+        ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
 
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();
 
-        ResourceLocation resourceLocation = new ResourceLocation(namespacedKey.getNamespace(), namespacedKey.getKey());
+        ResourceLocation resourceLocation = McUtils.getResourceLocation(biomeKey);
         ResourceKey<Biome> biomeResourceKey = ResourceKey.create(Registries.BIOME, resourceLocation);
         Holder.Reference<Biome> biome = BIOME_REGISTRY.getHolderOrThrow(biomeResourceKey);
 
-        LevelChunk chunk = worldGenLevel.getMinecraftWorld().getChunkAt(new BlockPos(x, y, z));
+        LevelChunk chunk = serverLevel.getChunkAt(new BlockPos(x, y, z));
         chunk.setBiome(x >> 2, y >> 2, z >> 2, biome);
         chunk.setUnsaved(true);
     }
@@ -101,7 +101,8 @@ public class WorldApi {
      * @param center   Where to look from
      * @return Location if a biome is found, null otherwise
      */
-    public static Location locateBiome(NamespacedKey biomeKey, Location center) {
+    @Nullable
+    public static Location locateBiome(@NotNull NamespacedKey biomeKey, @NotNull Location center) {
         return locateBiome(biomeKey, center, 6400, 8);
     }
 
@@ -114,7 +115,8 @@ public class WorldApi {
      * @param step     How many blocks to check in steps
      * @return Location if a biome is found, null otherwise
      */
-    public static Location locateBiome(NamespacedKey biomeKey, Location center, int radius, int step) {
+    @Nullable
+    public static Location locateBiome(@NotNull NamespacedKey biomeKey, @NotNull Location center, int radius, int step) {
         BlockPos blockPos = McUtils.getPos(center);
         ServerLevel level = McUtils.getServerLevel(center.getWorld());
         ResourceLocation resourceLocation = McUtils.getResourceLocation(biomeKey);
@@ -132,12 +134,13 @@ public class WorldApi {
      *
      * @return List of biomes
      */
+    @NotNull
     public static List<NamespacedKey> getBiomeKeys() {
-        WorldGenLevel worldGenLevel = ReflectionShortcuts.getWorldGenLevel(DEFAULT_WORLD);
+        WorldGenLevel worldGenLevel = McUtils.getWorldGenLevel(DEFAULT_WORLD);
 
         List<NamespacedKey> keys = new ArrayList<>();
         BIOME_REGISTRY.keySet().forEach(resourceLocation -> {
-            NamespacedKey namespacedKey = new NamespacedKey(resourceLocation.getNamespace(), resourceLocation.getPath());
+            NamespacedKey namespacedKey = McUtils.getNamespacedKey(resourceLocation);
             keys.add(namespacedKey);
         });
         return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
@@ -150,18 +153,16 @@ public class WorldApi {
      * @param location   Location to place at
      * @return True if feature was placed, otherwise false if failed
      */
-    public static boolean placeConfiguredFeature(NamespacedKey featureKey, Location location) {
+    public static boolean placeConfiguredFeature(@NotNull NamespacedKey featureKey, @NotNull Location location) {
         World bukkitWorld = location.getWorld() == null ? DEFAULT_WORLD : location.getWorld();
-        WorldGenLevel worldGenLevel = ReflectionShortcuts.getWorldGenLevel(bukkitWorld);
-        ServerLevel serverLevel = worldGenLevel.getLevel();
-        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
+        BlockPos blockPos = McUtils.getPos(location);
 
-        ResourceLocation featureLocation = new ResourceLocation(featureKey.getNamespace(), featureKey.getKey());
-
-        ResourceKey<ConfiguredFeature<?, ?>> placedFeatureResourceKey = ResourceKey.create(CONFIGURED_FEATURE_REGISTRY.key(), featureLocation);
-        Holder.Reference<ConfiguredFeature<?, ?>> placedFeatureHolder = CONFIGURED_FEATURE_REGISTRY.getHolderOrThrow(placedFeatureResourceKey);
-        ConfiguredFeature<?, ?> configuredFeature = placedFeatureHolder.value();
-        return configuredFeature.place(worldGenLevel, serverLevel.getChunkSource().getGenerator(), serverLevel.getRandom(), blockPos);
+        ResourceLocation featureLocation = McUtils.getResourceLocation(featureKey);
+        ResourceKey<ConfiguredFeature<?, ?>> configuredFeatureResourceKey = ResourceKey.create(CONFIGURED_FEATURE_REGISTRY.key(), featureLocation);
+        Holder.Reference<ConfiguredFeature<?, ?>> configuredFeatureHolder = CONFIGURED_FEATURE_REGISTRY.getHolderOrThrow(configuredFeatureResourceKey);
+        ConfiguredFeature<?, ?> configuredFeature = configuredFeatureHolder.value();
+        return configuredFeature.place(serverLevel, serverLevel.getChunkSource().getGenerator(), serverLevel.getRandom(), blockPos);
     }
 
     /**
@@ -171,18 +172,16 @@ public class WorldApi {
      * @param location   Location to place at
      * @return True if feature was placed, otherwise false if failed
      */
-    public static boolean placePlacedFeature(NamespacedKey featureKey, Location location) {
+    public static boolean placePlacedFeature(@NotNull NamespacedKey featureKey, @NotNull Location location) {
         World bukkitWorld = location.getWorld() == null ? DEFAULT_WORLD : location.getWorld();
-        WorldGenLevel worldGenLevel = ReflectionShortcuts.getWorldGenLevel(bukkitWorld);
-        ServerLevel serverLevel = worldGenLevel.getLevel();
-        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
+        BlockPos blockPos = McUtils.getPos(location);
 
-        ResourceLocation featureLocation = new ResourceLocation(featureKey.getNamespace(), featureKey.getKey());
-
+        ResourceLocation featureLocation = McUtils.getResourceLocation(featureKey);
         ResourceKey<PlacedFeature> placedFeatureResourceKey = ResourceKey.create(PLACED_FEATURE_REGISTRY.key(), featureLocation);
         Holder.Reference<PlacedFeature> placedFeatureHolder = PLACED_FEATURE_REGISTRY.getHolderOrThrow(placedFeatureResourceKey);
         PlacedFeature placedFeature = placedFeatureHolder.value();
-        return placedFeature.placeWithBiomeCheck(worldGenLevel, serverLevel.getChunkSource().getGenerator(), serverLevel.getRandom(), blockPos);
+        return placedFeature.placeWithBiomeCheck(serverLevel, serverLevel.getChunkSource().getGenerator(), serverLevel.getRandom(), blockPos);
     }
 
     /**
@@ -195,7 +194,8 @@ public class WorldApi {
      * @param location Location to center search from
      * @return Location of structure if found, otherwise null
      */
-    public static Location locateNearestStructure(NamespacedKey key, Location location) {
+    @Nullable
+    public static Location locateNearestStructure(@NotNull NamespacedKey key, @NotNull Location location) {
         return locateNearestStructure(key, location, 6400, true);
     }
 
@@ -210,12 +210,13 @@ public class WorldApi {
      * @param findUnexplored Whether to look for structures that haven't generated yet
      * @return Location of structure if found, otherwise null
      */
-    public static Location locateNearestStructure(NamespacedKey key, Location location, int radius, boolean findUnexplored) {
+    @Nullable
+    public static Location locateNearestStructure(@NotNull NamespacedKey key, @NotNull Location location, int radius, boolean findUnexplored) {
         World bukkitWorld = location.getWorld() == null ? DEFAULT_WORLD : location.getWorld();
-        ServerLevel serverLevel = ReflectionShortcuts.getServerLevel(bukkitWorld);
-        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
+        BlockPos blockPos = McUtils.getPos(location);
 
-        ResourceLocation featureLocation = new ResourceLocation(key.getNamespace(), key.getKey());
+        ResourceLocation featureLocation = McUtils.getResourceLocation(key);
         ResourceKey<Structure> structureResourceKey = ResourceKey.create(STRUCTURE_REGISTRY.key(), featureLocation);
         Holder.Reference<Structure> structureHolder = STRUCTURE_REGISTRY.getHolderOrThrow(structureResourceKey);
 
@@ -232,10 +233,11 @@ public class WorldApi {
      *
      * @return List of all registered configured features
      */
+    @NotNull
     public static List<NamespacedKey> getConfiguredFeatures() {
         List<NamespacedKey> keys = new ArrayList<>();
         CONFIGURED_FEATURE_REGISTRY.keySet().forEach(resourceLocation -> {
-            NamespacedKey namespacedKey = new NamespacedKey(resourceLocation.getNamespace(), resourceLocation.getPath());
+            NamespacedKey namespacedKey = McUtils.getNamespacedKey(resourceLocation);
             keys.add(namespacedKey);
         });
         return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
@@ -246,10 +248,11 @@ public class WorldApi {
      *
      * @return List of all registered placed features
      */
+    @NotNull
     public static List<NamespacedKey> getPlacedFeatures() {
         List<NamespacedKey> keys = new ArrayList<>();
         PLACED_FEATURE_REGISTRY.keySet().forEach(resourceLocation -> {
-            NamespacedKey namespacedKey = new NamespacedKey(resourceLocation.getNamespace(), resourceLocation.getPath());
+            NamespacedKey namespacedKey = McUtils.getNamespacedKey(resourceLocation);
             keys.add(namespacedKey);
         });
         return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
@@ -262,10 +265,11 @@ public class WorldApi {
      *
      * @return List of available structures
      */
+    @NotNull
     public static List<NamespacedKey> getStructures() {
         List<NamespacedKey> keys = new ArrayList<>();
         STRUCTURE_REGISTRY.keySet().forEach(resourceLocation -> {
-            NamespacedKey namespacedKey = new NamespacedKey(resourceLocation.getNamespace(), resourceLocation.getPath());
+            NamespacedKey namespacedKey = McUtils.getNamespacedKey(resourceLocation);
             keys.add(namespacedKey);
         });
         return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
