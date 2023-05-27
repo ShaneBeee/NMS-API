@@ -6,6 +6,7 @@ import com.shanebeestudios.nms.api.util.McUtils;
 import com.shanebeestudios.nms.api.util.RegistryUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -36,6 +38,7 @@ public class WorldApi {
     private static final Registry<Biome> BIOME_REGISTRY = RegistryUtils.getRegistry(Registries.BIOME);
     private static final Registry<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE_REGISTRY = RegistryUtils.getRegistry(Registries.CONFIGURED_FEATURE);
     private static final Registry<PlacedFeature> PLACED_FEATURE_REGISTRY = RegistryUtils.getRegistry(Registries.PLACED_FEATURE);
+    private static final Registry<Structure> STRUCTURE_REGISTRY = RegistryUtils.getRegistry(Registries.STRUCTURE);
 
 
     /**
@@ -183,6 +186,48 @@ public class WorldApi {
     }
 
     /**
+     * Locate the nearest placed structure
+     * <p>This does not mean a StructureBlock Structure, this means a structure
+     * placed in a world, such as a village.
+     * Will default to a radius of 6400 and true for findUnexplored.</p>
+     *
+     * @param key      Key of structure to find
+     * @param location Location to center search from
+     * @return Location of structure if found, otherwise null
+     */
+    public static Location locateNearestStructure(NamespacedKey key, Location location) {
+        return locateNearestStructure(key, location, 6400, true);
+    }
+
+    /**
+     * Locate the nearest placed structure
+     * <p>This does not mean a StructureBlock Structure, this means a structure
+     * placed in a world, such as a village.</p>
+     *
+     * @param key            Key of structure to find
+     * @param location       Location to center search from
+     * @param radius         Max radius to search in
+     * @param findUnexplored Whether to look for structures that haven't generated yet
+     * @return Location of structure if found, otherwise null
+     */
+    public static Location locateNearestStructure(NamespacedKey key, Location location, int radius, boolean findUnexplored) {
+        World bukkitWorld = location.getWorld() == null ? DEFAULT_WORLD : location.getWorld();
+        ServerLevel serverLevel = ReflectionShortcuts.getServerLevel(bukkitWorld);
+        BlockPos blockPos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
+        ResourceLocation featureLocation = new ResourceLocation(key.getNamespace(), key.getKey());
+        ResourceKey<Structure> structureResourceKey = ResourceKey.create(STRUCTURE_REGISTRY.key(), featureLocation);
+        Holder.Reference<Structure> structureHolder = STRUCTURE_REGISTRY.getHolderOrThrow(structureResourceKey);
+
+        Pair<BlockPos, Holder<Structure>> nearestMapStructure = serverLevel.getChunkSource().getGenerator()
+                .findNearestMapStructure(serverLevel, HolderSet.direct(structureHolder), blockPos, radius, findUnexplored);
+        if (nearestMapStructure != null) {
+            return McUtils.getLocation(nearestMapStructure.getFirst(), serverLevel);
+        }
+        return null;
+    }
+
+    /**
      * Get a list of all registered configured features
      *
      * @return List of all registered configured features
@@ -204,6 +249,22 @@ public class WorldApi {
     public static List<NamespacedKey> getPlacedFeatures() {
         List<NamespacedKey> keys = new ArrayList<>();
         PLACED_FEATURE_REGISTRY.keySet().forEach(resourceLocation -> {
+            NamespacedKey namespacedKey = new NamespacedKey(resourceLocation.getNamespace(), resourceLocation.getPath());
+            keys.add(namespacedKey);
+        });
+        return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
+    }
+
+    /**
+     * Get a list of available structures
+     * <p>This does not mean StructureBlock Structures, this means structures
+     * placed in a world, such as a village.</p>
+     *
+     * @return List of available structures
+     */
+    public static List<NamespacedKey> getStructures() {
+        List<NamespacedKey> keys = new ArrayList<>();
+        STRUCTURE_REGISTRY.keySet().forEach(resourceLocation -> {
             NamespacedKey namespacedKey = new NamespacedKey(resourceLocation.getNamespace(), resourceLocation.getPath());
             keys.add(namespacedKey);
         });
