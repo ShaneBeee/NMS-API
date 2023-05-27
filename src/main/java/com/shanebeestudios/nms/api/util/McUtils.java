@@ -46,6 +46,17 @@ public class McUtils {
     }
 
     /**
+     * Convert Minecraft ResourceLocation to Bukkit NamespacedKey
+     *
+     * @param resourceLocation ResourceLocation to change to NamespacedKey
+     * @return ResourceLocation from NamespacedKey
+     */
+    @SuppressWarnings("deprecation")
+    public static NamespacedKey getNamespacedKey(ResourceLocation resourceLocation) {
+        return new NamespacedKey(resourceLocation.getNamespace(), resourceLocation.getPath());
+    }
+
+    /**
      * Get an instance of ServerLevel from a {@link World Bukkit World}
      *
      * @param world World to get ServerLevel from
