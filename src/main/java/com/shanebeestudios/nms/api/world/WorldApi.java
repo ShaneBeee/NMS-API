@@ -274,4 +274,20 @@ public class WorldApi {
         return getRegistryKeys(STRUCTURE_REGISTRY);
     }
 
+    /**
+     * Check if a location is within a village
+     *
+     * @param location Location to check if in village
+     * @return True if location is within a village
+     */
+    public static boolean isWithinVillage(Location location) {
+        World world = location.getWorld();
+        if (world != null) {
+            ServerLevel serverLevel = McUtils.getServerLevel(world);
+            BlockPos blockPos = McUtils.getPos(location);
+            return serverLevel.isVillage(blockPos);
+        }
+        return false;
+    }
+
 }
