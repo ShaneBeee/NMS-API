@@ -8,12 +8,15 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Utility class for changing Minecraft to/from Bukkit classes
@@ -108,6 +111,17 @@ public class McUtils {
     @SuppressWarnings("deprecation")
     public static <T> Registry<T> getRegistry(ResourceKey<? extends Registry<? extends T>> registry) {
         return MinecraftServer.getServer().registryAccess().registryOrThrow(registry);
+    }
+
+    /**
+     * Get a Minecraft ServerPlayer from a Bukkit Player
+     *
+     * @param player Bukkit player to convert to NMS player
+     * @return NMS player
+     */
+    @Nullable
+    public static ServerPlayer getServerPlayer(Player player) {
+        return ReflectionShortcuts.getNMSPlayer(player);
     }
 
 }
