@@ -1,5 +1,6 @@
 package com.shanebeestudios.nms.api.util;
 
+import com.mojang.datafixers.util.Pair;
 import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -12,6 +13,7 @@ import net.minecraft.world.level.WorldGenLevel;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Utility class for changing Minecraft to/from Bukkit classes
@@ -24,8 +26,24 @@ public class McUtils {
      * @param location Location to change to BlockPos
      * @return BlockPos from Location
      */
-    public static BlockPos getPos(Location location) {
+    public static BlockPos getPos(@NotNull Location location) {
         return new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    }
+
+    /**
+     * Get a Minecraft Level and BlockPos from a Bukkit Location
+     *
+     * @param location Location to get world and pos from
+     * @return Pair of Level and BlockPos
+     */
+    public static Pair<Level, BlockPos> getLevelPos(@NotNull Location location) {
+        BlockPos pos = getPos(location);
+        World bukkitWorld = location.getWorld();
+        if (bukkitWorld == null) {
+            throw new IllegalArgumentException("Missing world in location");
+        }
+        ServerLevel serverLevel = getServerLevel(bukkitWorld);
+        return new Pair<>(serverLevel, pos);
     }
 
     /**
@@ -66,7 +84,7 @@ public class McUtils {
      * @param world World to get ServerLevel from
      * @return ServerLevel from World
      */
-    public static ServerLevel getServerLevel(World world) {
+    public static ServerLevel getServerLevel(@NotNull World world) {
         return ReflectionShortcuts.getServerLevel(world);
     }
 
@@ -76,7 +94,7 @@ public class McUtils {
      * @param world Bukkit world to get WorldGenLevel from
      * @return WorldGenLevel from Bukkit world
      */
-    public static WorldGenLevel getWorldGenLevel(World world) {
+    public static WorldGenLevel getWorldGenLevel(@NotNull World world) {
         return ReflectionShortcuts.getServerLevel(world);
     }
 
