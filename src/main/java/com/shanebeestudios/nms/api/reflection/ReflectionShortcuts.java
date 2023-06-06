@@ -1,6 +1,7 @@
 package com.shanebeestudios.nms.api.reflection;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -106,9 +107,9 @@ public class ReflectionShortcuts {
      * @return NMS player
      */
     @Nullable
-    public static net.minecraft.world.entity.player.Player getNMSPlayer(Player player) {
+    public static ServerPlayer getNMSPlayer(Player player) {
         net.minecraft.world.entity.Entity nmsEntity = getNMSEntity(player);
-        if (nmsEntity instanceof net.minecraft.world.entity.player.Player player1) return player1;
+        if (nmsEntity instanceof ServerPlayer serverPlayer) return serverPlayer;
         return null;
     }
 
