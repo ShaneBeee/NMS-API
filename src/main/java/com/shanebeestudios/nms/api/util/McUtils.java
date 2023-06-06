@@ -119,8 +119,8 @@ public class McUtils {
      * @param player Bukkit player to convert to NMS player
      * @return NMS player
      */
-    @Nullable
-    public static ServerPlayer getServerPlayer(Player player) {
+    @NotNull
+    public static ServerPlayer getServerPlayer(@NotNull Player player) {
         return ReflectionShortcuts.getNMSPlayer(player);
     }
 

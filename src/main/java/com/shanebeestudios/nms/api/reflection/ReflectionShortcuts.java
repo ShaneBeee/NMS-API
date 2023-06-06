@@ -10,6 +10,7 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
@@ -106,11 +107,11 @@ public class ReflectionShortcuts {
      * @param player Bukkit player to get NMS player from
      * @return NMS player
      */
-    @Nullable
-    public static ServerPlayer getNMSPlayer(Player player) {
+    @NotNull
+    public static ServerPlayer getNMSPlayer(@NotNull Player player) {
         net.minecraft.world.entity.Entity nmsEntity = getNMSEntity(player);
         if (nmsEntity instanceof ServerPlayer serverPlayer) return serverPlayer;
-        return null;
+        throw new IllegalArgumentException("Player is null");
     }
 
 }
