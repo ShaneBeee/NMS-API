@@ -90,7 +90,7 @@ public class EntityApi {
         if (nmsEntity == null) return;
         if (damageKey == null) damageKey = NamespacedKey.minecraft("generic");
 
-        Registry<DamageType> damageTypes = nmsEntity.getLevel().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+        Registry<DamageType> damageTypes = nmsEntity.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
         ResourceLocation resourceLocation = new ResourceLocation(damageKey.getNamespace(), damageKey.getKey());
         ResourceKey<DamageType> damageTypeResourceKey = ResourceKey.create(Registries.DAMAGE_TYPE, resourceLocation);
         Holder.Reference<DamageType> damageType = damageTypes.getHolderOrThrow(damageTypeResourceKey);
