@@ -12,7 +12,7 @@
         $.get("https://api.github.com/repos/ShaneBeee/NMS-API/contents/docs", function(data) {
             for(let dir of data) {
                 if(dir.name == "index.html") continue;
-                $("#list").append(`<p><a href="${dir.name}">${dir.name}</a></p>`);
+                $("#list").prepend(`<p><a href="${dir.name}">${dir.name}</a></p>`);
             }
         });
     });
