@@ -9,4 +9,8 @@ Check out the [**JavaDocs**](https://shanebeee.github.io/NMS-API/)
 Currently this library will only work on one version of Minecraft
 
 ### Current Version:
-- Minecraft 1.19.4
+- Minecraft 1.20
+
+## OUTDATED:
+
+- Minecraft 1.19.4 - [**NMS-API 1.0.0**](https://github.com/ShaneBeee/NMS-API/releases/tag/1.0.0)
