@@ -16,11 +16,11 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Utility class for changing Minecraft to/from Bukkit classes
  */
+@SuppressWarnings("unused")
 public class McUtils {
 
     /**
@@ -39,7 +39,7 @@ public class McUtils {
      * @param location Location to get world and pos from
      * @return Pair of Level and BlockPos
      */
-    public static Pair<Level, BlockPos> getLevelPos(@NotNull Location location) {
+    public static Pair<ServerLevel, BlockPos> getLevelPos(@NotNull Location location) {
         BlockPos pos = getPos(location);
         World bukkitWorld = location.getWorld();
         if (bukkitWorld == null) {
