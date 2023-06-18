@@ -9,31 +9,37 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.block.structure.Mirror;
+import org.bukkit.block.structure.StructureRotation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
  * Api methods pertaining to a {@link World}
  */
-@SuppressWarnings({"unused"})
+@SuppressWarnings({"unused", "deprecation"})
 public class WorldApi {
 
     private static final World DEFAULT_WORLD = Bukkit.getWorlds().get(0);
+    private static final StructureTemplateManager STRUCTURE_MANAGER = MinecraftServer.getServer().getStructureManager();
     private static final Registry<Biome> BIOME_REGISTRY = McUtils.getRegistry(Registries.BIOME);
     private static final Registry<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE_REGISTRY = McUtils.getRegistry(Registries.CONFIGURED_FEATURE);
     private static final Registry<PlacedFeature> PLACED_FEATURE_REGISTRY = McUtils.getRegistry(Registries.PLACED_FEATURE);
@@ -167,6 +173,7 @@ public class WorldApi {
      * @param featureKey Key of feature to place
      * @param location   Location to place at
      * @return True if feature was placed, otherwise false if failed
+     * @see <a href="https://minecraft.fandom.com/wiki/Custom_feature?so=search#Configured_Feature">McWiki - Configured Feature</a>
      */
     public static boolean placeConfiguredFeature(@NotNull NamespacedKey featureKey, @NotNull Location location) {
         World bukkitWorld = location.getWorld() == null ? DEFAULT_WORLD : location.getWorld();
@@ -186,6 +193,7 @@ public class WorldApi {
      * @param featureKey Key of feature to place
      * @param location   Location to place at
      * @return True if feature was placed, otherwise false if failed
+     * @see <a href="https://minecraft.fandom.com/wiki/Custom_feature?so=search#Placed_feature">McWiki - Placed Feature</a>
      */
     public static boolean placePlacedFeature(@NotNull NamespacedKey featureKey, @NotNull Location location) {
         World bukkitWorld = location.getWorld() == null ? DEFAULT_WORLD : location.getWorld();
@@ -272,6 +280,19 @@ public class WorldApi {
     @NotNull
     public static List<NamespacedKey> getStructures() {
         return getRegistryKeys(STRUCTURE_REGISTRY);
+    }
+
+    /**
+     * Get a list of available structure templates
+     * <p>You can load via {@link org.bukkit.structure.StructureManager#getStructure(NamespacedKey)},
+     * and place into world via {@link org.bukkit.structure.Structure#place(Location, boolean, StructureRotation, Mirror, int, float, Random)}</p>
+     *
+     * @return List of available structure templates
+     */
+    public static List<NamespacedKey> getStructureTemplates() {
+        List<NamespacedKey> keys = new ArrayList<>();
+        STRUCTURE_MANAGER.listTemplates().sorted(Comparator.comparing(ResourceLocation::toString)).forEach(resourceLocation -> keys.add(McUtils.getNamespacedKey(resourceLocation)));
+        return keys;
     }
 
     /**
