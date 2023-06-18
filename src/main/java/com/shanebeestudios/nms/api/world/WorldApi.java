@@ -17,7 +17,6 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -38,7 +37,6 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"unused", "deprecation"})
 public class WorldApi {
 
-    private static final World DEFAULT_WORLD = Bukkit.getWorlds().get(0);
     private static final StructureTemplateManager STRUCTURE_MANAGER = MinecraftServer.getServer().getStructureManager();
     private static final Registry<Biome> BIOME_REGISTRY = McUtils.getRegistry(Registries.BIOME);
     private static final Registry<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE_REGISTRY = McUtils.getRegistry(Registries.CONFIGURED_FEATURE);
@@ -81,10 +79,7 @@ public class WorldApi {
      */
     @NotNull
     public static NamespacedKey getBiome(@NotNull Location location) {
-        World bukkitWorld = location.getWorld();
-        if (bukkitWorld == null) bukkitWorld = DEFAULT_WORLD;
-
-        ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
+        ServerLevel serverLevel = McUtils.getLevelPos(location).getFirst();
 
         int x = location.getBlockX();
         int y = location.getBlockY();
@@ -106,10 +101,7 @@ public class WorldApi {
      * @param biomeKey Key of biome
      */
     public static void setBiome(@NotNull Location location, @NotNull NamespacedKey biomeKey) {
-        World bukkitWorld = location.getWorld();
-        if (bukkitWorld == null) bukkitWorld = DEFAULT_WORLD;
-
-        ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
+        ServerLevel serverLevel = McUtils.getLevelPos(location).getFirst();
         Holder.Reference<Biome> biome = getHolderReference(BIOME_REGISTRY, biomeKey);
 
         int x = location.getBlockX();
@@ -145,8 +137,9 @@ public class WorldApi {
      */
     @Nullable
     public static Location locateBiome(@NotNull NamespacedKey biomeKey, @NotNull Location center, int radius, int step) {
-        BlockPos blockPos = McUtils.getPos(center);
-        ServerLevel level = McUtils.getServerLevel(center.getWorld());
+        Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(center);
+        BlockPos blockPos = levelPos.getSecond();
+        ServerLevel level = levelPos.getFirst();
         ResourceLocation resourceLocation = McUtils.getResourceLocation(biomeKey);
         Pair<BlockPos, Holder<Biome>> closestBiome3d = level.findClosestBiome3d(holder ->
                 holder.is(resourceLocation), blockPos, radius, step, 64);
@@ -176,9 +169,9 @@ public class WorldApi {
      * @see <a href="https://minecraft.fandom.com/wiki/Custom_feature?so=search#Configured_Feature">McWiki - Configured Feature</a>
      */
     public static boolean placeConfiguredFeature(@NotNull NamespacedKey featureKey, @NotNull Location location) {
-        World bukkitWorld = location.getWorld() == null ? DEFAULT_WORLD : location.getWorld();
-        ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
-        BlockPos blockPos = McUtils.getPos(location);
+        Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(location);
+        ServerLevel serverLevel = levelPos.getFirst();
+        BlockPos blockPos = levelPos.getSecond();
 
         ConfiguredFeature<?, ?> configuredFeature = getRegistryValue(CONFIGURED_FEATURE_REGISTRY, featureKey);
         if (configuredFeature != null) {
@@ -196,9 +189,9 @@ public class WorldApi {
      * @see <a href="https://minecraft.fandom.com/wiki/Custom_feature?so=search#Placed_feature">McWiki - Placed Feature</a>
      */
     public static boolean placePlacedFeature(@NotNull NamespacedKey featureKey, @NotNull Location location) {
-        World bukkitWorld = location.getWorld() == null ? DEFAULT_WORLD : location.getWorld();
-        ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
-        BlockPos blockPos = McUtils.getPos(location);
+        Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(location);
+        ServerLevel serverLevel = levelPos.getFirst();
+        BlockPos blockPos = levelPos.getSecond();
 
         PlacedFeature placedFeature = getRegistryValue(PLACED_FEATURE_REGISTRY, featureKey);
         if (placedFeature != null) {
@@ -235,9 +228,9 @@ public class WorldApi {
      */
     @Nullable
     public static Location locateNearestStructure(@NotNull NamespacedKey structureKey, @NotNull Location location, int radius, boolean findUnexplored) {
-        World bukkitWorld = location.getWorld() == null ? DEFAULT_WORLD : location.getWorld();
-        ServerLevel serverLevel = McUtils.getServerLevel(bukkitWorld);
-        BlockPos blockPos = McUtils.getPos(location);
+        Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(location);
+        ServerLevel serverLevel = levelPos.getFirst();
+        BlockPos blockPos = levelPos.getSecond();
 
         Holder.Reference<Structure> structureHolder = getHolderReference(STRUCTURE_REGISTRY, structureKey);
         if (structureHolder != null) {
