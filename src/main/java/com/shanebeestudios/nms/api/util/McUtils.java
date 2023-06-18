@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +23,12 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for changing Minecraft to/from Bukkit classes
@@ -170,6 +177,54 @@ public class McUtils {
     public static BlockData getBlockDataFromState(BlockState blockState) {
         BlockData blockDataFromBlockState = ReflectionShortcuts.getBlockDataFromBlockState(blockState);
         return blockDataFromBlockState != null ? blockDataFromBlockState : AIR;
+    }
+
+    /**
+     * Get a holder reference from a registry
+     *
+     * @param registry Registry to grab holder from
+     * @param key      Key of holder
+     * @param <T>      Class type of registry
+     * @return Holder from registry
+     */
+    @Nullable
+    public static <T> Holder.Reference<T> getHolderReference(Registry<T> registry, NamespacedKey key) {
+        ResourceLocation resourceLocation = McUtils.getResourceLocation(key);
+        ResourceKey<T> resourceKey = ResourceKey.create(registry.key(), resourceLocation);
+        try {
+            return registry.getHolderOrThrow(resourceKey);
+        } catch (IllegalStateException ignore) {
+            return null;
+        }
+    }
+
+    /**
+     * Get a keyed value from a registry
+     *
+     * @param registry Registry to grab value from
+     * @param key      Key of value to grab
+     * @param <T>      Registry class type
+     * @return Value from registry
+     */
+    @Nullable
+    public static <T> T getRegistryValue(Registry<T> registry, NamespacedKey key) {
+        Holder.Reference<T> holderReference = getHolderReference(registry, key);
+        return holderReference != null ? holderReference.value() : null;
+    }
+
+    /**
+     * Get all keys from a registry
+     *
+     * @param registry Registry to grab keys from
+     * @return List of NamespacedKeys for all keys in registry
+     */
+    public static <T> List<NamespacedKey> getRegistryKeys(Registry<T> registry) {
+        List<NamespacedKey> keys = new ArrayList<>();
+        registry.keySet().forEach(resourceLocation -> {
+            NamespacedKey namespacedKey = McUtils.getNamespacedKey(resourceLocation);
+            keys.add(namespacedKey);
+        });
+        return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
     }
 
 }
