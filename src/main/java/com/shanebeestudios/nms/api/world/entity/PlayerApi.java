@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,7 +28,7 @@ import java.util.Map;
 public class PlayerApi {
 
     private static final MinecraftServer MINECRAFT_SERVER = MinecraftServer.getServer();
-    private static final Map<String, FakePlayer> FAKE_PLAYERS = new HashMap<>();
+    static final Map<String, FakePlayer> FAKE_PLAYERS = new HashMap<>();
 
     /**
      * Spawn a {@link FakePlayer}
@@ -63,6 +64,10 @@ public class PlayerApi {
             return FAKE_PLAYERS.get(name);
         }
         return null;
+    }
+
+    public static List<FakePlayer> getFakePlayers() {
+        return (List<FakePlayer>) FAKE_PLAYERS.values();
     }
 
     /**
