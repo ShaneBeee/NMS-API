@@ -8,7 +8,6 @@ import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -17,7 +16,7 @@ import java.util.List;
 /**
  * Represents a fake {@link ServerPlayer}
  * <p>
- *     Can create in {@link PlayerApi#spawnFakePlayer(String, Location)}
+ * Can create in {@link PlayerApi#spawnFakePlayer(String, Location)}
  * </p>
  */
 @SuppressWarnings({"deprecation", "unused"})
@@ -67,6 +66,27 @@ public class FakePlayer {
     }
 
     /**
+     * Remove the player from the player list
+     */
+    public void removeFromPlayerList() {
+        MinecraftServer.getServer().getPlayerList().players.forEach(serverPlayer -> {
+            ServerGamePacketListenerImpl connection = serverPlayer.connection;
+            connection.send(new ClientboundPlayerInfoRemovePacket(List.of(this.fakeServerPlayer.getUUID())));
+        });
+    }
+
+    /**
+     * Add the player to the player list
+     */
+    public void addToPlayerList() {
+        MinecraftServer.getServer().getPlayerList().players.forEach(serverPlayer -> {
+            ServerGamePacketListenerImpl connection = serverPlayer.connection;
+            connection.send(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, this.fakeServerPlayer));
+            connection.send(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED, this.fakeServerPlayer));
+        });
+    }
+
+    /**
      * Remove this fake player
      */
     public void remove() {
@@ -76,10 +96,6 @@ public class FakePlayer {
             connection.send(new ClientboundRemoveEntitiesPacket(this.id));
             connection.send(new ClientboundPlayerInfoRemovePacket(List.of(this.fakeServerPlayer.getUUID())));
         });
-    }
-
-    private Vec3 vecFromLocation(Location location) {
-        return new Vec3(location.getX(), location.getY(), location.getZ());
     }
 
     @Override
