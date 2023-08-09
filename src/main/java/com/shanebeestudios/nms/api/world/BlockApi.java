@@ -1,6 +1,7 @@
 package com.shanebeestudios.nms.api.world;
 
 import com.shanebeestudios.nms.api.util.McUtils;
+import com.shanebeestudios.nms.api.world.item.ItemApi;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
