@@ -7,6 +7,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
@@ -87,10 +88,11 @@ public class EntityApi {
 
     private static void damage(@NotNull org.bukkit.entity.Entity victim, float damage, @Nullable NamespacedKey damageKey, @Nullable org.bukkit.entity.Entity directEntity, @Nullable org.bukkit.entity.Entity causingEntity, @Nullable Vector vec) {
         Entity nmsEntity = getNMSEntity(victim);
-        if (nmsEntity == null) return;
+        ServerLevel serverLevel = ReflectionShortcuts.getServerLevel(victim.getWorld());
+        if (nmsEntity == null || serverLevel == null) return;
         if (damageKey == null) damageKey = NamespacedKey.minecraft("generic");
 
-        Registry<DamageType> damageTypes = nmsEntity.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+        Registry<DamageType> damageTypes = serverLevel.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
         ResourceLocation resourceLocation = new ResourceLocation(damageKey.getNamespace(), damageKey.getKey());
         ResourceKey<DamageType> damageTypeResourceKey = ResourceKey.create(Registries.DAMAGE_TYPE, resourceLocation);
         Holder.Reference<DamageType> damageType = damageTypes.getHolderOrThrow(damageTypeResourceKey);
