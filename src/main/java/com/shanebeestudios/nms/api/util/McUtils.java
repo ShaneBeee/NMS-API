@@ -19,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
@@ -177,6 +178,16 @@ public class McUtils {
     public static BlockData getBlockDataFromState(BlockState blockState) {
         BlockData blockDataFromBlockState = ReflectionShortcuts.getBlockDataFromBlockState(blockState);
         return blockDataFromBlockState != null ? blockDataFromBlockState : AIR;
+    }
+
+    /**
+     * Get a Minecraft BlockState from a Bukkit Block
+     *
+     * @param bukkitBlock Bukkit Block to grab state from
+     * @return BlockState from Bukkit Block
+     */
+    public static BlockState getBlockStateFromBlock(Block bukkitBlock) {
+        return ReflectionShortcuts.getBlockStateFromBlock(bukkitBlock);
     }
 
     /**

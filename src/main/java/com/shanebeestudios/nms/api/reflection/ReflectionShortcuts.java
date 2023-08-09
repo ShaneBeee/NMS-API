@@ -10,6 +10,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -37,6 +38,9 @@ public class ReflectionShortcuts {
     private static final Field CRAFT_ITEM_STACK_HANDLE_FIELD;
     private static final Class<?> CRAFT_BLOCK_DATA_CLASS;
     private static final Method CRAFT_BLOCK_DATA_FROM_DATA_METHOD;
+    private static final Class<?> CRAFT_BLOCK_CLASS;
+    private static final Method CRAFT_BLOCK_GET_NMS_METHOD;
+
 
     static {
         try {
@@ -45,17 +49,20 @@ public class ReflectionShortcuts {
             CRAFT_CHUNK_CLASS = ReflectionUtils.getOBCClass("CraftChunk");
             CRAFT_ITEM_STACK_CLASS = ReflectionUtils.getOBCClass("inventory.CraftItemStack");
             CRAFT_BLOCK_DATA_CLASS = ReflectionUtils.getOBCClass("block.data.CraftBlockData");
+            CRAFT_BLOCK_CLASS = ReflectionUtils.getOBCClass("block.CraftBlock");
             assert CRAFT_REGION_ACCESSOR_CLASS != null;
             assert CRAFT_WORLD_CLASS != null;
             assert CRAFT_CHUNK_CLASS != null;
             assert CRAFT_ITEM_STACK_CLASS != null;
             assert CRAFT_BLOCK_DATA_CLASS != null;
+            assert CRAFT_BLOCK_CLASS != null;
             CRAFT_WORLD_GET_HANDLE_METHOD = CRAFT_WORLD_CLASS.getMethod("getHandle");
             CRAFT_REGION_GET_HANDLE_METHOD = CRAFT_REGION_ACCESSOR_CLASS.getMethod("getHandle");
             CRAFT_CHUNK_GET_HANDLE_METHOD = CRAFT_CHUNK_CLASS.getMethod("getHandle", ChunkStatus.class);
             CRAFT_ITEM_STACK_GET_NMS_ITEM_METHOD = CRAFT_ITEM_STACK_CLASS.getMethod("asNMSCopy", org.bukkit.inventory.ItemStack.class);
             CRAFT_ITEM_STACK_HANDLE_FIELD = CRAFT_ITEM_STACK_CLASS.getField("handle");
             CRAFT_BLOCK_DATA_FROM_DATA_METHOD = CRAFT_BLOCK_DATA_CLASS.getMethod("fromData", BlockState.class);
+            CRAFT_BLOCK_GET_NMS_METHOD = CRAFT_BLOCK_CLASS.getMethod("getNMS");
         } catch (NoSuchMethodException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
@@ -154,6 +161,16 @@ public class ReflectionShortcuts {
             return ((BlockData) invoke);
         } catch (IllegalAccessException | InvocationTargetException ignore) {
             return null;
+        }
+    }
+
+    public static BlockState getBlockStateFromBlock(Block bukkitBlock) {
+        try {
+            Object blockStateObject = CRAFT_BLOCK_GET_NMS_METHOD.invoke(bukkitBlock);
+            if (blockStateObject instanceof BlockState blockState) return blockState;
+            return null;
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
