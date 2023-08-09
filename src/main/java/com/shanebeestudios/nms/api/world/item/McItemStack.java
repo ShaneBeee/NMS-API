@@ -36,12 +36,19 @@ public class McItemStack {
     }
 
     /**
-     * Get Minecraft ItemStack
+     * Get Minecraft ItemStack of this wrapper
      *
      * @return ItemStack
      */
     public ItemStack getItemStack() {
         return itemStack;
+    }
+
+    /** Get a wrapped version of the Item of this ItemStack
+     * @return Wrapped Item
+     */
+    public McItem getItemWrapper() {
+        return McItem.wrap(this.itemStack.getItem());
     }
 
     /**

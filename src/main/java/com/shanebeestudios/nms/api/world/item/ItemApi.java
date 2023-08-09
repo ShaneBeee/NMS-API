@@ -8,7 +8,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TieredItem;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -40,17 +42,6 @@ public class ItemApi {
         return ReflectionShortcuts.getNMSItemStack(bukkitItemStack);
     }
 
-    /**
-     * Get a Wrapped ItemStack for easy to use methods
-     *
-     * @param bukkitItemStack Bukkit ItemStack to wrap
-     * @return Wrapped version of ItemStack
-     */
-    public static McItemStack getWrappedItemStack(org.bukkit.inventory.ItemStack bukkitItemStack) {
-        ItemStack nmsItemStack = getNMSItemStack(bukkitItemStack);
-        return McItemStack.wrap(nmsItemStack);
-    }
-
     public static NamespacedKey getKey(ItemStack itemStack) {
         ResourceLocation key = ITEM_REGISTRY.getKey(itemStack.getItem());
         assert key != null;
@@ -68,6 +59,17 @@ public class ItemApi {
     }
 
     /**
+     * Get a Minecraft Item from a {@link Material Bukkit Material}
+     *
+     * @param bukkitMaterial Material to get Item from
+     * @return Item from material if valid else AIR
+     */
+    @NotNull
+    public static Item getItem(Material bukkitMaterial) {
+        return ReflectionShortcuts.getItemFromMaterial(bukkitMaterial);
+    }
+
+    /**
      * Get the {@link McTier Tier} from a Tiered Item
      *
      * @param item Tiered Item to get Tier from
@@ -77,6 +79,27 @@ public class ItemApi {
     public static McTier getTier(Item item) {
         if (item instanceof TieredItem tieredItem) return new McTier(tieredItem);
         return null;
+    }
+
+    /**
+     * Get a wrapped ItemStack for easy to use methods
+     *
+     * @param bukkitItemStack Bukkit ItemStack to wrap
+     * @return Wrapped version of ItemStack
+     */
+    public static McItemStack getWrappedItemStack(org.bukkit.inventory.ItemStack bukkitItemStack) {
+        ItemStack nmsItemStack = getNMSItemStack(bukkitItemStack);
+        return McItemStack.wrap(nmsItemStack);
+    }
+
+    /**
+     * Get a wrapped Item for easy to use methods
+     *
+     * @param item Item to wrap
+     * @return Wrapped version of Item
+     */
+    public static McItem getWrappedItem(Item item) {
+        return McItem.wrap(item);
     }
 
 }

@@ -2,13 +2,16 @@ package com.shanebeestudios.nms.api.reflection;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -40,7 +43,8 @@ public class ReflectionShortcuts {
     private static final Method CRAFT_BLOCK_DATA_FROM_DATA_METHOD;
     private static final Class<?> CRAFT_BLOCK_CLASS;
     private static final Method CRAFT_BLOCK_GET_NMS_METHOD;
-
+    private static final Class<?> CRAFT_MAGIC_NUMBERS_CLASS;
+    private static final Method CRAFT_MAGIC_NUMBERS_ITEM_METHOD;
 
     static {
         try {
@@ -50,12 +54,14 @@ public class ReflectionShortcuts {
             CRAFT_ITEM_STACK_CLASS = ReflectionUtils.getOBCClass("inventory.CraftItemStack");
             CRAFT_BLOCK_DATA_CLASS = ReflectionUtils.getOBCClass("block.data.CraftBlockData");
             CRAFT_BLOCK_CLASS = ReflectionUtils.getOBCClass("block.CraftBlock");
+            CRAFT_MAGIC_NUMBERS_CLASS = ReflectionUtils.getOBCClass("util.CraftMagicNumbers");
             assert CRAFT_REGION_ACCESSOR_CLASS != null;
             assert CRAFT_WORLD_CLASS != null;
             assert CRAFT_CHUNK_CLASS != null;
             assert CRAFT_ITEM_STACK_CLASS != null;
             assert CRAFT_BLOCK_DATA_CLASS != null;
             assert CRAFT_BLOCK_CLASS != null;
+            assert CRAFT_MAGIC_NUMBERS_CLASS != null;
             CRAFT_WORLD_GET_HANDLE_METHOD = CRAFT_WORLD_CLASS.getMethod("getHandle");
             CRAFT_REGION_GET_HANDLE_METHOD = CRAFT_REGION_ACCESSOR_CLASS.getMethod("getHandle");
             CRAFT_CHUNK_GET_HANDLE_METHOD = CRAFT_CHUNK_CLASS.getMethod("getHandle", ChunkStatus.class);
@@ -63,6 +69,7 @@ public class ReflectionShortcuts {
             CRAFT_ITEM_STACK_HANDLE_FIELD = CRAFT_ITEM_STACK_CLASS.getField("handle");
             CRAFT_BLOCK_DATA_FROM_DATA_METHOD = CRAFT_BLOCK_DATA_CLASS.getMethod("fromData", BlockState.class);
             CRAFT_BLOCK_GET_NMS_METHOD = CRAFT_BLOCK_CLASS.getMethod("getNMS");
+            CRAFT_MAGIC_NUMBERS_ITEM_METHOD = CRAFT_MAGIC_NUMBERS_CLASS.getMethod("getItem", Material.class);
         } catch (NoSuchMethodException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
@@ -152,6 +159,16 @@ public class ReflectionShortcuts {
             return ((ItemStack) nmsStack);
         } catch (IllegalAccessException ignore) {
             return ItemStack.EMPTY;
+        }
+    }
+
+    public static Item getItemFromMaterial(Material material) {
+        try {
+            Object itemObject = CRAFT_MAGIC_NUMBERS_ITEM_METHOD.invoke(null, material);
+            if (itemObject instanceof Item item) return item;
+            return Items.AIR;
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
         }
     }
 
