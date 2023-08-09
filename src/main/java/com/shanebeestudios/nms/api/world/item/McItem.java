@@ -41,7 +41,7 @@ public class McItem {
      */
     @Nullable
     public McTier getTier() {
-        if (this.item instanceof TieredItem tieredItem) return new McTier(tieredItem);
+        if (this.item instanceof TieredItem tieredItem) return McTier.wrap(tieredItem);
         return null;
     }
 

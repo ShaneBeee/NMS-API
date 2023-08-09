@@ -32,6 +32,9 @@ import java.util.Random;
 @SuppressWarnings("unused")
 public class StructureApi {
 
+    private StructureApi() {
+    }
+
     @SuppressWarnings("deprecation")
     private static final StructureTemplateManager STRUCTURE_MANAGER = MinecraftServer.getServer().getStructureManager();
     private static final Registry<ConfiguredFeature<?, ?>> CONFIGURED_FEATURE_REGISTRY = McUtils.getRegistry(Registries.CONFIGURED_FEATURE);

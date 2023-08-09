@@ -27,6 +27,9 @@ import java.util.Map;
 @SuppressWarnings({"unused", "deprecation"})
 public class PlayerApi {
 
+    private PlayerApi() {
+    }
+
     private static final MinecraftServer MINECRAFT_SERVER = MinecraftServer.getServer();
     static final Map<String, FakePlayer> FAKE_PLAYERS = new HashMap<>();
 

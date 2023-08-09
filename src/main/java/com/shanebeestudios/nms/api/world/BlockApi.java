@@ -26,6 +26,9 @@ import org.jetbrains.annotations.Nullable;
 @SuppressWarnings("unused")
 public class BlockApi {
 
+    private BlockApi() {
+    }
+
     /**
      * Get the BlockData that would be placed at a specific
      * position as well as the location of the placement

@@ -10,9 +10,13 @@ import org.jetbrains.annotations.NotNull;
  */
 public class McTier {
 
+    public static McTier wrap(TieredItem tieredItem) {
+        return new McTier(tieredItem);
+    }
+
     private final Tier tier;
 
-    public McTier(TieredItem tieredItem) {
+    private McTier(TieredItem tieredItem) {
         this.tier = tieredItem.getTier();
     }
 

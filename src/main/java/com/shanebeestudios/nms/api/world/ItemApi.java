@@ -8,5 +8,7 @@ package com.shanebeestudios.nms.api.world;
 public class ItemApi extends com.shanebeestudios.nms.api.world.item.ItemApi {
 
     private ItemApi() {
+        super();
     }
+
 }

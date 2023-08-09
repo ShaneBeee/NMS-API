@@ -21,6 +21,8 @@ public class ItemApi {
 
     private static final Registry<Item> ITEM_REGISTRY = McUtils.getRegistry(Registries.ITEM);
 
+    protected ItemApi() {
+    }
 
     /**
      * Get a copy of a Minecraft ItemStack from a Bukkit ItemStack
@@ -77,7 +79,7 @@ public class ItemApi {
      */
     @Nullable
     public static McTier getTier(Item item) {
-        if (item instanceof TieredItem tieredItem) return new McTier(tieredItem);
+        if (item instanceof TieredItem tieredItem) return McTier.wrap(tieredItem);
         return null;
     }
 

@@ -28,6 +28,9 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"deprecation", "unused"})
 public class EntityApi {
 
+    private EntityApi() {
+    }
+
     /**
      * Get an NMS Entity from a {@link org.bukkit.entity.Entity Bukkit Entity}
      *

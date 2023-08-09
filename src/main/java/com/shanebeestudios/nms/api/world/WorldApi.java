@@ -24,6 +24,9 @@ import java.util.List;
 @SuppressWarnings({"unused"})
 public class WorldApi {
 
+    private WorldApi() {
+    }
+
     private static final Registry<Biome> BIOME_REGISTRY = McUtils.getRegistry(Registries.BIOME);
 
 

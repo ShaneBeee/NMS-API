@@ -24,6 +24,9 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class ChunkApi {
 
+    private ChunkApi() {
+    }
+
     // LevelChunk#isTicking is package private
     private static final Method CHUNK_IS_TICKING_METHOD;
 
