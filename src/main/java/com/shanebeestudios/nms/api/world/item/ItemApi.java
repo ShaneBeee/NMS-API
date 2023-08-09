@@ -40,6 +40,12 @@ public class ItemApi {
         return ReflectionShortcuts.getNMSItemStack(bukkitItemStack);
     }
 
+    /**
+     * Get a Wrapped ItemStack for easy to use methods
+     *
+     * @param bukkitItemStack Bukkit ItemStack to wrap
+     * @return Wrapped version of ItemStack
+     */
     public static McItemStack getWrappedItemStack(org.bukkit.inventory.ItemStack bukkitItemStack) {
         ItemStack nmsItemStack = getNMSItemStack(bukkitItemStack);
         return McItemStack.wrap(nmsItemStack);
