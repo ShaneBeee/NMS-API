@@ -5,17 +5,23 @@ import com.shanebeestudios.nms.api.util.McUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,6 +62,7 @@ public class WorldApi {
 
     /**
      * Set a biome at a location, including custom biomes.
+     * <p>Will not send biome updates to players.</p>
      *
      * @param location Location of biome to change
      * @param biomeKey Key of biome
@@ -63,6 +70,7 @@ public class WorldApi {
     public static void setBiome(@NotNull Location location, @NotNull NamespacedKey biomeKey) {
         ServerLevel serverLevel = McUtils.getLevelPos(location).getFirst();
         Holder.Reference<Biome> biome = McUtils.getHolderReference(BIOME_REGISTRY, biomeKey);
+        if (biome == null) return;
 
         int x = location.getBlockX();
         int y = location.getBlockY();
@@ -71,6 +79,43 @@ public class WorldApi {
         LevelChunk chunk = serverLevel.getChunkAt(new BlockPos(x, y, z));
         chunk.setBiome(x >> 2, y >> 2, z >> 2, biome);
         chunk.setUnsaved(true);
+    }
+
+    /**
+     * Fill a biome between 2 locations.
+     * <p>Will also send biome updates to players.</p>
+     *
+     * @param location  First corner
+     * @param location2 Second corner
+     * @param biomeKey  Key of biome
+     */
+    public static void fillBiome(@NotNull Location location, @NotNull Location location2, @NotNull NamespacedKey biomeKey) {
+        World world = location.getWorld();
+        if (world != location2.getWorld()) {
+            throw new IllegalArgumentException("Worlds for both locations do not match!");
+        }
+
+        BlockPos blockPos = McUtils.quantize(McUtils.getPos(location));
+        BlockPos blockPos2 = McUtils.quantize(McUtils.getPos(location2));
+        BoundingBox box = BoundingBox.fromCorners(blockPos, blockPos2);
+        ServerLevel level = McUtils.getServerLevel(world);
+
+        Holder.Reference<Biome> biome = McUtils.getHolderReference(BIOME_REGISTRY, biomeKey);
+        if (biome == null) return;
+
+        List<ChunkAccess> chunkAccessList = new ArrayList<>();
+        for (int z = SectionPos.blockToSectionCoord(box.minZ()); z <= SectionPos.blockToSectionCoord(box.maxZ()); ++z) {
+            for (int x = SectionPos.blockToSectionCoord(box.minX()); x <= SectionPos.blockToSectionCoord(box.maxX()); ++x) {
+                ChunkAccess chunkAccess = level.getChunk(x, z, ChunkStatus.FULL, false);
+                if (chunkAccess != null) chunkAccessList.add(chunkAccess);
+            }
+        }
+
+        for (ChunkAccess chunkAccess : chunkAccessList) {
+            chunkAccess.fillBiomesFromNoise(McUtils.getBiomeResolver(new MutableInt(0), chunkAccess, box, biome, f -> true), level.getChunkSource().randomState().sampler());
+            chunkAccess.setUnsaved(true);
+        }
+        level.getChunkSource().chunkMap.resendBiomesForChunks(chunkAccessList);
     }
 
     /**

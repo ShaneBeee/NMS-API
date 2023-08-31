@@ -5,6 +5,7 @@ import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
+import net.minecraft.core.QuartPos;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -13,8 +14,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -29,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -121,7 +128,6 @@ public class McUtils {
      * @param resourceLocation ResourceLocation to change to NamespacedKey
      * @return ResourceLocation from NamespacedKey
      */
-    @SuppressWarnings("deprecation")
     public static NamespacedKey getNamespacedKey(ResourceLocation resourceLocation) {
         return new NamespacedKey(resourceLocation.getNamespace(), resourceLocation.getPath());
     }
@@ -153,7 +159,6 @@ public class McUtils {
      * @param <T>      ResourceKey
      * @return Registry from key
      */
-    @SuppressWarnings("deprecation")
     public static <T> Registry<T> getRegistry(ResourceKey<? extends Registry<? extends T>> registry) {
         return MinecraftServer.getServer().registryAccess().registryOrThrow(registry);
     }
@@ -237,6 +242,51 @@ public class McUtils {
             keys.add(namespacedKey);
         });
         return keys.stream().sorted(Comparator.comparing(NamespacedKey::toString)).collect(Collectors.toList());
+    }
+
+    /**
+     * Shift coordinates for 3D biomes
+     *
+     * @param coordinate Coordinate to shift
+     * @return Shifted coordinate
+     */
+    public static int quantize(int coordinate) {
+        return QuartPos.toBlock(QuartPos.fromBlock(coordinate));
+    }
+
+    /**
+     * Shift blockPos for 3D biomes
+     *
+     * @param pos BlockPos to shift
+     * @return Shifted BlockPos
+     */
+    public static BlockPos quantize(BlockPos pos) {
+        return new BlockPos(quantize(pos.getX()), quantize(pos.getY()), quantize(pos.getZ()));
+    }
+
+    /**
+     * Make a resolver for 3D shifted biomes
+     *
+     * @param count       counter
+     * @param chunkAccess Chunk where biome is
+     * @param box         BoundingBox for biome change
+     * @param biome       Biome
+     * @param filter      Filter
+     * @return Biome resolver
+     */
+    public static BiomeResolver getBiomeResolver(MutableInt count, ChunkAccess chunkAccess, BoundingBox box, Holder<Biome> biome, Predicate<Holder<Biome>> filter) {
+        return (x, y, z, noise) -> {
+            int i = QuartPos.toBlock(x);
+            int j = QuartPos.toBlock(y);
+            int k = QuartPos.toBlock(z);
+            Holder<Biome> biomeHolder = chunkAccess.getNoiseBiome(x, y, z);
+            if (box.isInside(i, j, k) && filter.test(biomeHolder)) {
+                count.increment();
+                return biome;
+            } else {
+                return biomeHolder;
+            }
+        };
     }
 
 }
