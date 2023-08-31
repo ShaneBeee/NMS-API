@@ -1,8 +1,8 @@
 package com.shanebeestudios.nms.api.world;
 
+import com.mojang.datafixers.util.Pair;
 import com.shanebeestudios.nms.api.util.McUtils;
 import com.shanebeestudios.nms.api.world.item.ItemApi;
-import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -64,7 +64,7 @@ public class BlockApi {
     @Nullable
     public static BlockData getBlockDataForPlacement(Player player, int maxDistance) {
         Pair<Location, BlockData> forPlacement = getForPlacement(player, maxDistance);
-        if (forPlacement != null) return forPlacement.second();
+        if (forPlacement != null) return forPlacement.getSecond();
         return null;
     }
 
