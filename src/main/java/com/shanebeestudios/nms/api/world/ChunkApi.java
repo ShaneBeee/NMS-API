@@ -72,7 +72,9 @@ public class ChunkApi {
      *
      * @param location Location to check for ticking
      * @return True if chunk is ticking else false
+     * @deprecated Instead use {@link Chunk#getLoadLevel()}
      */
+    @Deprecated
     public static boolean isTickingAtLocation(@NotNull Location location) {
         LevelChunk levelChunk = getLevelChunk(location.getChunk());
         BlockPos pos = McUtils.getPos(location);
@@ -89,7 +91,9 @@ public class ChunkApi {
      *
      * @param chunk Chunk to check if ticking
      * @return True if chunk is ticking else false
+     * @deprecated Instead use {@link Chunk#getLoadLevel()}
      */
+    @Deprecated // Aug 30/2023
     public static boolean isTicking(Chunk chunk) {
         World world = chunk.getWorld();
         int x = (chunk.getX() << 4) + 7;
