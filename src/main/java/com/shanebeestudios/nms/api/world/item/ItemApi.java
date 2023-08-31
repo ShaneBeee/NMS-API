@@ -21,7 +21,12 @@ public class ItemApi {
 
     private static final Registry<Item> ITEM_REGISTRY = McUtils.getRegistry(Registries.ITEM);
 
+    /**
+     * DO NOT USE
+     */
+    // this is only protected because we're extending from it
     protected ItemApi() {
+        throw new IllegalArgumentException("You can't initiate this class");
     }
 
     /**
@@ -44,6 +49,13 @@ public class ItemApi {
         return ReflectionShortcuts.getNMSItemStack(bukkitItemStack);
     }
 
+    /**
+     * Get the NamespacedKey of an Item
+     * <p>This is useless, not sure why I added it, since you can do this in Bukkit</p>
+     *
+     * @param itemStack ItemStack to get key of
+     * @return Key of item
+     */
     public static NamespacedKey getKey(ItemStack itemStack) {
         ResourceLocation key = ITEM_REGISTRY.getKey(itemStack.getItem());
         assert key != null;
@@ -90,8 +102,7 @@ public class ItemApi {
      * @return Wrapped version of ItemStack
      */
     public static McItemStack getWrappedItemStack(org.bukkit.inventory.ItemStack bukkitItemStack) {
-        ItemStack nmsItemStack = getNMSItemStack(bukkitItemStack);
-        return McItemStack.wrap(nmsItemStack);
+        return McItemStack.wrap(bukkitItemStack);
     }
 
     /**

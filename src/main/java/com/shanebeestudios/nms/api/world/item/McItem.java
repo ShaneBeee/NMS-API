@@ -15,6 +15,12 @@ import org.jetbrains.annotations.Nullable;
 @SuppressWarnings("unused")
 public class McItem {
 
+    /**
+     * Wrap an Item for easy to use methods
+     *
+     * @param item Item to wrap
+     * @return Wrapped item
+     */
     public static McItem wrap(Item item) {
         return new McItem(item);
     }
@@ -113,6 +119,11 @@ public class McItem {
         return this.item.isFireResistant();
     }
 
+    /**
+     * Check if Item is complex
+     *
+     * @return True if complex else false
+     */
     public boolean isComplex() {
         return this.item.isComplex();
     }
@@ -147,10 +158,25 @@ public class McItem {
         };
     }
 
+    /**
+     * Item Rarity
+     */
     public enum Rarity {
+        /**
+         *
+         */
         COMMON,
+        /**
+         *
+         */
         UNCOMMON,
+        /**
+         *
+         */
         RARE,
+        /**
+         *
+         */
         EPIC
     }
 

@@ -227,6 +227,7 @@ public class McUtils {
      * Get all keys from a registry
      *
      * @param registry Registry to grab keys from
+     * @param <T>      Registry class type
      * @return List of NamespacedKeys for all keys in registry
      */
     public static <T> List<NamespacedKey> getRegistryKeys(Registry<T> registry) {

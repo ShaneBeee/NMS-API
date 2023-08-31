@@ -26,9 +26,25 @@ public class McItemStack {
 
     private final ItemStack itemStack;
 
+    /**
+     * Wrap an NMS ItemStack to use easy to use methods
+     *
+     * @param itemStack NMS ItemStack to wrap
+     * @return Wrapped ItemStack
+     */
     @NotNull
     public static McItemStack wrap(@Nullable ItemStack itemStack) {
         return new McItemStack(itemStack);
+    }
+
+    /**
+     * Wrap a Bukkit ItemStack to use easy to use methods
+     *
+     * @param bukkitItemStack Bukkit ItemStack to wrap
+     * @return Wrapped ItemStack
+     */
+    public static McItemStack wrap(@Nullable org.bukkit.inventory.ItemStack bukkitItemStack) {
+        return wrap(ItemApi.getNMSItemStack(bukkitItemStack));
     }
 
     private McItemStack(@Nullable ItemStack itemStack) {
@@ -44,7 +60,9 @@ public class McItemStack {
         return itemStack;
     }
 
-    /** Get a wrapped version of the Item of this ItemStack
+    /**
+     * Get a wrapped version of the Item of this ItemStack
+     *
      * @return Wrapped Item
      */
     public McItem getItemWrapper() {
@@ -71,6 +89,11 @@ public class McItemStack {
         return this.itemStack.getDestroySpeed(blockState);
     }
 
+    /**
+     * Check if ItemStack is a damageable item
+     *
+     * @return True if damageable else false
+     */
     public boolean isDamageableItem() {
         return this.itemStack.isDamageableItem();
     }

@@ -44,6 +44,10 @@ public class EntityApi {
         return ReflectionShortcuts.getNMSEntity(bukkitEntity);
     }
 
+    /** Get the NMS EntityType from Bukkit EntityType
+     * @param bukkitType Bukkit EntityType to convert
+     * @return NMS EntityType from Bukkit
+     */
     public static EntityType<?> getEntityType(org.bukkit.entity.EntityType bukkitType) {
         NamespacedKey key = bukkitType.getKey();
         ResourceLocation resourceLocation = McUtils.getResourceLocation(key);

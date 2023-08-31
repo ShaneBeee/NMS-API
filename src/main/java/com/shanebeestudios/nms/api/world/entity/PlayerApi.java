@@ -69,6 +69,9 @@ public class PlayerApi {
         return null;
     }
 
+    /** Get all fake players
+     * @return List of all fake players
+     */
     public static List<FakePlayer> getFakePlayers() {
         return (List<FakePlayer>) FAKE_PLAYERS.values();
     }

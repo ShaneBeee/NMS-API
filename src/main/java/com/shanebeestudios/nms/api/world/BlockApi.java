@@ -68,6 +68,15 @@ public class BlockApi {
         return null;
     }
 
+    /**
+     * Get the BlockData that would be placed at a specific position
+     *
+     * @param player      Player that would be placing
+     * @param hitBlock    The block that was hit
+     * @param hitLocation The position of the player's cursor
+     * @param face        The fact of the block relative to the hit block
+     * @return BlockData of what would be placed
+     */
     @Nullable
     public static BlockData getBlockDataForPlacement(Player player, Block hitBlock, Location hitLocation, BlockFace face) {
         ItemStack handItem = player.getInventory().getItemInMainHand();
