@@ -1,8 +1,10 @@
 package com.shanebeestudios.nms.api.world.entity;
 
 import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
+import com.shanebeestudios.nms.api.util.McUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -11,6 +13,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.NamespacedKey;
 import org.bukkit.util.Vector;
@@ -39,6 +42,13 @@ public class EntityApi {
      */
     public static Entity getNMSEntity(org.bukkit.entity.Entity bukkitEntity) {
         return ReflectionShortcuts.getNMSEntity(bukkitEntity);
+    }
+
+    public static EntityType<?> getEntityType(org.bukkit.entity.EntityType bukkitType) {
+        NamespacedKey key = bukkitType.getKey();
+        ResourceLocation resourceLocation = McUtils.getResourceLocation(key);
+        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(resourceLocation);
+        return entityType;
     }
 
     /**
