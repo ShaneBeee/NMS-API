@@ -1,0 +1,65 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id("io.papermc.paperweight.userdev") version "1.5.5" // the latest version can be found on the Gradle Plugin Portal
+}
+
+// The Minecraft version we're currently building for
+def api = '1.20.1'
+
+compileJava {
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Paper
+    compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
+
+    paperweight.paperDevBundle(api + "-R0.1-SNAPSHOT")
+}
+
+build {
+    dependsOn(reobfJar)
+    tasks.withType(JavaCompile).tap {
+        configureEach {
+            options.compilerArgs.add("-Xlint:unchecked")
+            options.compilerArgs.add("-Xlint:deprecation")
+        }
+    }
+}
+
+processResources {
+    filter ReplaceTokens, tokens: ["version": project.property("version")]
+}
+
+// Run task to build jar to another spot
+tasks.register('server', Copy) {
+    from reobfJar
+    // Change this to wherever you want your jar to build
+    into '/Users/ShaneBee/Desktop/Server/Skript/1-20/plugins/skript-reflect/'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'com.shanebeestudios'
+            artifactId 'NMS-API'
+            version project.version
+        }
+    }
+}
+
+javadoc {
+    destinationDir = file("${buildDir}/javadoc")
+    options {
+        links('https://hub.spigotmc.org/javadocs/spigot/')
+    }
+}
