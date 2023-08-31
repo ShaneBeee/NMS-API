@@ -1,3 +1,0 @@
-name: NMS-API
-main: com.shanebeestudios.nms.plugin.NMSApi
-version: '${project.version}'
