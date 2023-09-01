@@ -196,6 +196,17 @@ public class McUtils {
     }
 
     /**
+     * Get a Minecraft BlockState from a Bukkit BlockData
+     *
+     * @param blockData BlockData to convert
+     * @return Converted BlockState
+     */
+    @Nullable
+    public static BlockState getBlockStateFromData(BlockData blockData) {
+        return ReflectionShortcuts.getBlockStateFromData(blockData);
+    }
+
+    /**
      * Get a holder reference from a registry
      *
      * @param registry Registry to grab holder from

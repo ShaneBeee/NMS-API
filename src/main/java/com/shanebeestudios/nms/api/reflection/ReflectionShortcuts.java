@@ -41,6 +41,7 @@ public class ReflectionShortcuts {
     private static final Field CRAFT_ITEM_STACK_HANDLE_FIELD;
     private static final Class<?> CRAFT_BLOCK_DATA_CLASS;
     private static final Method CRAFT_BLOCK_DATA_FROM_DATA_METHOD;
+    private static final Method CRAFT_BLOCK_DATA_GET_STATE_METHOD;
     private static final Class<?> CRAFT_BLOCK_CLASS;
     private static final Method CRAFT_BLOCK_GET_NMS_METHOD;
     private static final Class<?> CRAFT_MAGIC_NUMBERS_CLASS;
@@ -68,6 +69,7 @@ public class ReflectionShortcuts {
             CRAFT_ITEM_STACK_GET_NMS_ITEM_METHOD = CRAFT_ITEM_STACK_CLASS.getMethod("asNMSCopy", org.bukkit.inventory.ItemStack.class);
             CRAFT_ITEM_STACK_HANDLE_FIELD = CRAFT_ITEM_STACK_CLASS.getField("handle");
             CRAFT_BLOCK_DATA_FROM_DATA_METHOD = CRAFT_BLOCK_DATA_CLASS.getMethod("fromData", BlockState.class);
+            CRAFT_BLOCK_DATA_GET_STATE_METHOD = CRAFT_BLOCK_DATA_CLASS.getMethod("getState");
             CRAFT_BLOCK_GET_NMS_METHOD = CRAFT_BLOCK_CLASS.getMethod("getNMS");
             CRAFT_MAGIC_NUMBERS_ITEM_METHOD = CRAFT_MAGIC_NUMBERS_CLASS.getMethod("getItem", Material.class);
         } catch (NoSuchMethodException | NoSuchFieldException e) {
@@ -184,6 +186,17 @@ public class ReflectionShortcuts {
     public static BlockState getBlockStateFromBlock(Block bukkitBlock) {
         try {
             Object blockStateObject = CRAFT_BLOCK_GET_NMS_METHOD.invoke(bukkitBlock);
+            if (blockStateObject instanceof BlockState blockState) return blockState;
+            return null;
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Nullable
+    public static BlockState getBlockStateFromData(BlockData blockData) {
+        try {
+            Object blockStateObject = CRAFT_BLOCK_DATA_GET_STATE_METHOD.invoke(blockData);
             if (blockStateObject instanceof BlockState blockState) return blockState;
             return null;
         } catch (InvocationTargetException | IllegalAccessException e) {
