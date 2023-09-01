@@ -1,7 +1,9 @@
 package com.shanebeestudios.nms.api.world;
 
+import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import com.shanebeestudios.nms.api.util.McUtils;
+import net.minecraft.commands.arguments.blocks.BlockInput;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -9,7 +11,11 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -18,11 +24,13 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * API methods relating to {@link World Worlds}
@@ -180,6 +188,50 @@ public class WorldApi {
             return serverLevel.isVillage(blockPos);
         }
         return false;
+    }
+
+    /**
+     * Fill blocks within 2 locations
+     * <p>Similar system to Minecraft's fill command</p>
+     *
+     * @param location  Corner 1
+     * @param location2 Corner 2
+     * @param data      BlockData to set
+     * @param replace   BlockData to replace (can be null)
+     */
+    public static void fillBlocks(@NotNull Location location, @NotNull Location location2, @NotNull BlockData data, @Nullable BlockData replace) {
+        World world = location.getWorld();
+        if (world != location2.getWorld()) {
+            throw new IllegalArgumentException("Worlds for both locations need to match.");
+        }
+
+        BlockPos blockPos = McUtils.getPos(location);
+        BlockPos blockPos2 = McUtils.getPos(location2);
+
+        ServerLevel level = McUtils.getServerLevel(world);
+        BlockState changeTo = McUtils.getBlockStateFromData(data);
+        if (changeTo == null) {
+            throw new IllegalArgumentException("Invalid BlockData '" + data + "' potentially a Bukkit bug.");
+        }
+
+        Set<Property<?>> properties = Set.of(changeTo.getProperties().toArray(new Property<?>[0]));
+        BlockInput changeInput = new BlockInput(changeTo, properties, null);
+        BlockState toReplace = replace != null ? McUtils.getBlockStateFromData(replace) : null;
+
+        List<BlockPos> replacedBlocks = Lists.newArrayList();
+        for (BlockPos pos : BlockPos.betweenClosed(blockPos, blockPos2)) {
+            if (toReplace == null || level.getBlockState(pos).getBlock() == toReplace.getBlock()) {
+                BlockEntity blockEntity = level.getBlockEntity(pos);
+                Clearable.tryClear(blockEntity);
+                if (changeInput.place(level, pos, 2)) {
+                    replacedBlocks.add(pos.immutable());
+                }
+            }
+        }
+
+        for (BlockPos pos : replacedBlocks) {
+            level.blockUpdated(pos, level.getBlockState(pos).getBlock());
+        }
     }
 
 }
