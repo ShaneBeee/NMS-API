@@ -18,6 +18,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -40,7 +41,8 @@ public class BlockApi {
      * @param maxDistance Max distance to check for
      * @return Pair of location and block data
      */
-    public static Pair<Location, BlockData> getForPlacement(Player player, int maxDistance) {
+    @Nullable
+    public static Pair<Location, BlockData> getForPlacement(@NotNull Player player, int maxDistance) {
         ServerPlayer serverPlayer = McUtils.getServerPlayer(player);
         net.minecraft.world.item.ItemStack handItem = serverPlayer.getMainHandItem();
         if (handItem.getItem() instanceof BlockItem blockItem) {
@@ -65,7 +67,7 @@ public class BlockApi {
      * @return BlockData of what would be placed
      */
     @Nullable
-    public static BlockData getBlockDataForPlacement(Player player, int maxDistance) {
+    public static BlockData getBlockDataForPlacement(@NotNull Player player, int maxDistance) {
         Pair<Location, BlockData> forPlacement = getForPlacement(player, maxDistance);
         if (forPlacement != null) return forPlacement.getSecond();
         return null;
@@ -81,7 +83,7 @@ public class BlockApi {
      * @return BlockData of what would be placed
      */
     @Nullable
-    public static BlockData getBlockDataForPlacement(Player player, Block hitBlock, Location hitLocation, BlockFace face) {
+    public static BlockData getBlockDataForPlacement(@NotNull Player player, @NotNull Block hitBlock, @NotNull Location hitLocation, @NotNull BlockFace face) {
         ItemStack handItem = player.getInventory().getItemInMainHand();
         return getBlockDataForPlacement(player, hitBlock, hitLocation, face, handItem);
     }
@@ -97,7 +99,7 @@ public class BlockApi {
      * @return BlockData of what would be placed
      */
     @Nullable
-    public static BlockData getBlockDataForPlacement(Player player, Block hitBlock, Location hitLocation, BlockFace face, ItemStack itemStack) {
+    public static BlockData getBlockDataForPlacement(@NotNull Player player, @NotNull Block hitBlock, @NotNull Location hitLocation, @NotNull BlockFace face, @NotNull ItemStack itemStack) {
         ServerPlayer serverPlayer = McUtils.getServerPlayer(player);
         BlockPos hitTarget = McUtils.getPos(hitBlock.getLocation());
         net.minecraft.world.item.ItemStack nmsItemStack = ItemApi.getNMSItemStackCopy(itemStack);
@@ -119,7 +121,7 @@ public class BlockApi {
      * @return BlockData of what would be placed
      */
     @Nullable
-    private static BlockData getBlockDataForPlacement(ServerPlayer serverPlayer, BlockPos hitTarget, Vec3 hitPosition, Direction direction, net.minecraft.world.item.ItemStack itemStack) {
+    private static BlockData getBlockDataForPlacement(@NotNull ServerPlayer serverPlayer, @NotNull BlockPos hitTarget, @NotNull Vec3 hitPosition, @NotNull Direction direction, @NotNull net.minecraft.world.item.ItemStack itemStack) {
         BlockHitResult hit = new BlockHitResult(hitPosition, direction, hitTarget, false);
         BlockPlaceContext blockPlaceContext = new BlockPlaceContext(serverPlayer, InteractionHand.MAIN_HAND, itemStack, hit);
 

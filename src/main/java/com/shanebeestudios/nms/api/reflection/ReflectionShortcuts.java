@@ -6,6 +6,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -18,7 +19,6 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -97,6 +97,7 @@ public class ReflectionShortcuts {
      * @param world World to get ServerLevel from
      * @return ServerLevel from World
      */
+    @NotNull
     public static ServerLevel getServerLevel(World world) {
         World bukkitWorld = world != null ? world : DEFAULT_WORLD;
         try {
@@ -120,17 +121,16 @@ public class ReflectionShortcuts {
      * @param entity Bukkit entity to get NMS entity from
      * @return NMS entity
      */
-    @Nullable
-    public static net.minecraft.world.entity.Entity getNMSEntity(Entity entity) {
+    @NotNull
+    public static net.minecraft.world.entity.Entity getNMSEntity(@NotNull Entity entity) {
         try {
             Method getHandle = entity.getClass().getMethod("getHandle");
             Object invoke = getHandle.invoke(entity);
             if (invoke instanceof net.minecraft.world.entity.Entity entity1) return entity1;
-            return null;
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
+        throw new IllegalArgumentException("Entity is null");
     }
 
     /**
@@ -187,18 +187,17 @@ public class ReflectionShortcuts {
         try {
             Object blockStateObject = CRAFT_BLOCK_GET_NMS_METHOD.invoke(bukkitBlock);
             if (blockStateObject instanceof BlockState blockState) return blockState;
-            return null;
+            return Blocks.AIR.defaultBlockState();
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @Nullable
     public static BlockState getBlockStateFromData(BlockData blockData) {
         try {
             Object blockStateObject = CRAFT_BLOCK_DATA_GET_STATE_METHOD.invoke(blockData);
             if (blockStateObject instanceof BlockState blockState) return blockState;
-            return null;
+            return Blocks.AIR.defaultBlockState();
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

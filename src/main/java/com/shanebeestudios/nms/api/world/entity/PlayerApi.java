@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * Api methods pertaining to a {@link org.bukkit.entity.Player}
  */
-@SuppressWarnings({"unused", "deprecation"})
+@SuppressWarnings("unused")
 public class PlayerApi {
 
     private PlayerApi() {
@@ -69,7 +69,9 @@ public class PlayerApi {
         return null;
     }
 
-    /** Get all fake players
+    /**
+     * Get all fake players
+     *
      * @return List of all fake players
      */
     public static List<FakePlayer> getFakePlayers() {
@@ -83,13 +85,9 @@ public class PlayerApi {
      * @param player Bukkit Player to get connection from
      * @return Connection from Player
      */
-    @Nullable
-    public static ServerGamePacketListenerImpl getPlayerConnection(@NotNull Player player) {
-        net.minecraft.world.entity.player.Player nmsPlayer = ReflectionShortcuts.getNMSPlayer(player);
-        if (nmsPlayer instanceof ServerPlayer serverPlayer) {
-            return serverPlayer.connection;
-        }
-        return null;
+    public static @NotNull ServerGamePacketListenerImpl getPlayerConnection(@NotNull Player player) {
+        ServerPlayer serverPlayer = ReflectionShortcuts.getNMSPlayer(player);
+        return serverPlayer.connection;
     }
 
     /**
@@ -100,9 +98,7 @@ public class PlayerApi {
      */
     public static void sendPacket(@NotNull Player player, @NotNull Packet<?> packet) {
         ServerGamePacketListenerImpl playerConnection = getPlayerConnection(player);
-        if (playerConnection != null) {
-            playerConnection.send(packet);
-        }
+        playerConnection.send(packet);
     }
 
     /**
@@ -111,9 +107,8 @@ public class PlayerApi {
      * @param player Player to riptide
      * @param time   Ticks to riptide
      */
-    public static void riptide(Player player, int time) {
+    public static void riptide(@NotNull Player player, int time) {
         net.minecraft.world.entity.player.Player nmsPlayer = ReflectionShortcuts.getNMSPlayer(player);
-        if (nmsPlayer == null) return;
         nmsPlayer.startAutoSpinAttack(time);
     }
 
@@ -124,11 +119,9 @@ public class PlayerApi {
      * @param player Player to do the touching
      * @param entity Entity to touch
      */
-    public static void touch(Player player, Entity entity) {
+    public static void touch(@NotNull Player player, @NotNull Entity entity) {
         net.minecraft.world.entity.player.Player nmsPlayer = ReflectionShortcuts.getNMSPlayer(player);
         net.minecraft.world.entity.Entity nmsEntity = ReflectionShortcuts.getNMSEntity(entity);
-
-        if (nmsPlayer == null || nmsEntity == null) return;
         nmsEntity.playerTouch(nmsPlayer);
     }
 

@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
  * Can create in {@link PlayerApi#spawnFakePlayer(String, Location)}
  * </p>
  */
-@SuppressWarnings({"deprecation", "unused"})
+@SuppressWarnings("unused")
 public class FakePlayer {
 
     private final ServerPlayer fakeServerPlayer;
@@ -36,7 +37,7 @@ public class FakePlayer {
      *
      * @param location Location to teleport to
      */
-    public void teleport(Location location) {
+    public void teleport(@NotNull Location location) {
         this.fakeServerPlayer.absMoveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
         update();
     }
@@ -53,7 +54,7 @@ public class FakePlayer {
      *
      * @param player Player to update for
      */
-    public void update(Player player) {
+    public void update(@NotNull Player player) {
         ServerPlayer serverPlayer = McUtils.getServerPlayer(player);
         update(serverPlayer);
     }

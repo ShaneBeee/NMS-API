@@ -45,7 +45,8 @@ public class ChunkApi {
      * @param chunk Bukkit chunk
      * @return Minecraft LevelChunk from Bukkit chunk
      */
-    public static LevelChunk getLevelChunk(Chunk chunk) {
+    @NotNull
+    public static LevelChunk getLevelChunk(@NotNull Chunk chunk) {
         return ReflectionShortcuts.getLevelChunk(chunk);
     }
 
@@ -56,7 +57,8 @@ public class ChunkApi {
      * @param chunk Chunk to grab ticket holders from
      * @return List of players holding the chunk open
      */
-    public static List<Player> getTicketHolders(Chunk chunk) {
+    @NotNull
+    public static List<Player> getTicketHolders(@NotNull Chunk chunk) {
         LevelChunk levelChunk = getLevelChunk(chunk);
         ServerLevel level = (ServerLevel) levelChunk.getLevel();
         ChunkMap chunkMap = level.getChunkSource().chunkMap;
@@ -74,7 +76,7 @@ public class ChunkApi {
      * @return True if chunk is ticking else false
      * @deprecated Instead use {@link Chunk#getLoadLevel()}
      */
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "1.4.0")
     public static boolean isTickingAtLocation(@NotNull Location location) {
         LevelChunk levelChunk = getLevelChunk(location.getChunk());
         BlockPos pos = McUtils.getPos(location);
@@ -93,7 +95,7 @@ public class ChunkApi {
      * @return True if chunk is ticking else false
      * @deprecated Instead use {@link Chunk#getLoadLevel()}
      */
-    @Deprecated // Aug 30/2023
+    @Deprecated(forRemoval = true, since = "1.4.0")
     public static boolean isTicking(Chunk chunk) {
         World world = chunk.getWorld();
         int x = (chunk.getX() << 4) + 7;

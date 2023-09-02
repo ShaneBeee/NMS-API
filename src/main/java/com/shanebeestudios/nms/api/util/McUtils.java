@@ -52,6 +52,7 @@ public class McUtils {
      * @param location Location to change to BlockPos
      * @return BlockPos from Location
      */
+    @NotNull
     public static BlockPos getPos(@NotNull Location location) {
         return new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
@@ -62,6 +63,7 @@ public class McUtils {
      * @param location Location to convert to Vec3
      * @return Vec3 from Location
      */
+    @NotNull
     public static Vec3 getVec3(Location location) {
         return new Vec3(location.getX(), location.getY(), location.getZ());
     }
@@ -91,6 +93,7 @@ public class McUtils {
      * @param location Location to get world and pos from
      * @return Pair of Level and BlockPos
      */
+    @NotNull
     public static Pair<ServerLevel, BlockPos> getLevelPos(@NotNull Location location) {
         BlockPos pos = getPos(location);
         World bukkitWorld = location.getWorld();
@@ -108,6 +111,7 @@ public class McUtils {
      * @param level    Level to add to location
      * @return Location from BlockPos/Level
      */
+    @NotNull
     public static Location getLocation(BlockPos blockPos, Level level) {
         return new Location(level.getWorld(), blockPos.getX(), blockPos.getY(), blockPos.getZ());
     }
@@ -118,6 +122,7 @@ public class McUtils {
      * @param bukkitKey NamespacedKey to change to ResourceLocation
      * @return ResourceLocation from NamespacedKey
      */
+    @NotNull
     public static ResourceLocation getResourceLocation(NamespacedKey bukkitKey) {
         return new ResourceLocation(bukkitKey.getNamespace(), bukkitKey.getKey());
     }
@@ -128,6 +133,7 @@ public class McUtils {
      * @param resourceLocation ResourceLocation to change to NamespacedKey
      * @return ResourceLocation from NamespacedKey
      */
+    @NotNull
     public static NamespacedKey getNamespacedKey(ResourceLocation resourceLocation) {
         return new NamespacedKey(resourceLocation.getNamespace(), resourceLocation.getPath());
     }
@@ -138,6 +144,7 @@ public class McUtils {
      * @param world World to get ServerLevel from
      * @return ServerLevel from World
      */
+    @NotNull
     public static ServerLevel getServerLevel(@NotNull World world) {
         return ReflectionShortcuts.getServerLevel(world);
     }
@@ -148,8 +155,9 @@ public class McUtils {
      * @param world Bukkit world to get WorldGenLevel from
      * @return WorldGenLevel from Bukkit world
      */
+    @NotNull
     public static WorldGenLevel getWorldGenLevel(@NotNull World world) {
-        return ReflectionShortcuts.getServerLevel(world);
+        return ReflectionShortcuts.getWorldGenLevel(world);
     }
 
     /**
@@ -180,6 +188,7 @@ public class McUtils {
      * @param blockState BlockState to convert
      * @return BlockData from state
      */
+    @NotNull
     public static BlockData getBlockDataFromState(BlockState blockState) {
         BlockData blockDataFromBlockState = ReflectionShortcuts.getBlockDataFromBlockState(blockState);
         return blockDataFromBlockState != null ? blockDataFromBlockState : AIR;
@@ -191,6 +200,7 @@ public class McUtils {
      * @param bukkitBlock Bukkit Block to grab state from
      * @return BlockState from Bukkit Block
      */
+    @NotNull
     public static BlockState getBlockStateFromBlock(Block bukkitBlock) {
         return ReflectionShortcuts.getBlockStateFromBlock(bukkitBlock);
     }
@@ -201,7 +211,7 @@ public class McUtils {
      * @param blockData BlockData to convert
      * @return Converted BlockState
      */
-    @Nullable
+    @NotNull
     public static BlockState getBlockStateFromData(BlockData blockData) {
         return ReflectionShortcuts.getBlockStateFromData(blockData);
     }
@@ -246,6 +256,7 @@ public class McUtils {
      * @param <T>      Registry class type
      * @return List of NamespacedKeys for all keys in registry
      */
+    @NotNull
     public static <T> List<NamespacedKey> getRegistryKeys(Registry<T> registry) {
         List<NamespacedKey> keys = new ArrayList<>();
         registry.keySet().forEach(resourceLocation -> {
@@ -285,6 +296,7 @@ public class McUtils {
      * @param filter      Filter
      * @return Biome resolver
      */
+    @NotNull
     public static BiomeResolver getBiomeResolver(MutableInt count, ChunkAccess chunkAccess, BoundingBox box, Holder<Biome> biome, Predicate<Holder<Biome>> filter) {
         return (x, y, z, noise) -> {
             int i = QuartPos.toBlock(x);

@@ -210,9 +210,6 @@ public class WorldApi {
 
         ServerLevel level = McUtils.getServerLevel(world);
         BlockState changeTo = McUtils.getBlockStateFromData(data);
-        if (changeTo == null) {
-            throw new IllegalArgumentException("Invalid BlockData '" + data + "' potentially a Bukkit bug.");
-        }
 
         Set<Property<?>> properties = Set.of(changeTo.getProperties().toArray(new Property<?>[0]));
         BlockInput changeInput = new BlockInput(changeTo, properties, null);

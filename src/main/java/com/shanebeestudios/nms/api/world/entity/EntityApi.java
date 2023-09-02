@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 /**
  * Api methods pertaining to an {@link org.bukkit.entity.Entity}
  */
-@SuppressWarnings({"deprecation", "unused"})
+@SuppressWarnings("unused")
 public class EntityApi {
 
     private EntityApi() {
@@ -51,8 +51,7 @@ public class EntityApi {
     public static EntityType<?> getEntityType(org.bukkit.entity.EntityType bukkitType) {
         NamespacedKey key = bukkitType.getKey();
         ResourceLocation resourceLocation = McUtils.getResourceLocation(key);
-        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(resourceLocation);
-        return entityType;
+        return BuiltInRegistries.ENTITY_TYPE.get(resourceLocation);
     }
 
     /**
@@ -106,7 +105,6 @@ public class EntityApi {
     private static void damage(@NotNull org.bukkit.entity.Entity victim, float damage, @Nullable NamespacedKey damageKey, @Nullable org.bukkit.entity.Entity directEntity, @Nullable org.bukkit.entity.Entity causingEntity, @Nullable Vector vec) {
         Entity nmsEntity = getNMSEntity(victim);
         ServerLevel serverLevel = ReflectionShortcuts.getServerLevel(victim.getWorld());
-        if (nmsEntity == null || serverLevel == null) return;
         if (damageKey == null) damageKey = NamespacedKey.minecraft("generic");
 
         Registry<DamageType> damageTypes = serverLevel.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);

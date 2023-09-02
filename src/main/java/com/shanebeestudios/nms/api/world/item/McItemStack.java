@@ -12,7 +12,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,7 @@ public class McItemStack {
      * @return Wrapped ItemStack
      */
     @NotNull
-    public static McItemStack wrap(@Nullable ItemStack itemStack) {
+    public static McItemStack wrap(@NotNull ItemStack itemStack) {
         return new McItemStack(itemStack);
     }
 
@@ -43,12 +42,23 @@ public class McItemStack {
      * @param bukkitItemStack Bukkit ItemStack to wrap
      * @return Wrapped ItemStack
      */
-    public static McItemStack wrap(@Nullable org.bukkit.inventory.ItemStack bukkitItemStack) {
+    @NotNull
+    public static McItemStack wrap(@NotNull org.bukkit.inventory.ItemStack bukkitItemStack) {
         return wrap(ItemApi.getNMSItemStack(bukkitItemStack));
     }
 
-    private McItemStack(@Nullable ItemStack itemStack) {
-        this.itemStack = (itemStack == null ? ItemStack.EMPTY : itemStack);
+    /**
+     * Get an empty ItemStack wrapped
+     *
+     * @return Wrapped empty ItemStack
+     */
+    @NotNull
+    public static McItemStack empty() {
+        return new McItemStack(ItemStack.EMPTY);
+    }
+
+    private McItemStack(@NotNull ItemStack itemStack) {
+        this.itemStack = itemStack;
     }
 
     /**

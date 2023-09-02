@@ -35,7 +35,8 @@ public class ItemApi {
      * @param bukkitItemStack Bukkit ItemStack to convert
      * @return Minecraft ItemStack cloned from Bukkit ItemStack
      */
-    public static ItemStack getNMSItemStackCopy(org.bukkit.inventory.ItemStack bukkitItemStack) {
+    @NotNull
+    public static ItemStack getNMSItemStackCopy(@NotNull org.bukkit.inventory.ItemStack bukkitItemStack) {
         return ReflectionShortcuts.getNMSItemStackCopy(bukkitItemStack);
     }
 
@@ -45,7 +46,8 @@ public class ItemApi {
      * @param bukkitItemStack Bukkit ItemStack to convert
      * @return Minecraft ItemStack converted from Bukkit ItemStack
      */
-    public static ItemStack getNMSItemStack(org.bukkit.inventory.ItemStack bukkitItemStack) {
+    @NotNull
+    public static ItemStack getNMSItemStack(@NotNull org.bukkit.inventory.ItemStack bukkitItemStack) {
         return ReflectionShortcuts.getNMSItemStack(bukkitItemStack);
     }
 
@@ -56,7 +58,8 @@ public class ItemApi {
      * @param itemStack ItemStack to get key of
      * @return Key of item
      */
-    public static NamespacedKey getKey(ItemStack itemStack) {
+    @NotNull
+    public static NamespacedKey getKey(@NotNull ItemStack itemStack) {
         ResourceLocation key = ITEM_REGISTRY.getKey(itemStack.getItem());
         assert key != null;
         return McUtils.getNamespacedKey(key);
@@ -68,7 +71,8 @@ public class ItemApi {
      * @param itemStack ItemStack to get Item from
      * @return Item from stack
      */
-    public static Item getItem(ItemStack itemStack) {
+    @NotNull
+    public static Item getItem(@NotNull ItemStack itemStack) {
         return itemStack.getItem();
     }
 
@@ -79,7 +83,7 @@ public class ItemApi {
      * @return Item from material if valid else AIR
      */
     @NotNull
-    public static Item getItem(Material bukkitMaterial) {
+    public static Item getItem(@NotNull Material bukkitMaterial) {
         return ReflectionShortcuts.getItemFromMaterial(bukkitMaterial);
     }
 
@@ -90,7 +94,7 @@ public class ItemApi {
      * @return Tier of Item
      */
     @Nullable
-    public static McTier getTier(Item item) {
+    public static McTier getTier(@NotNull Item item) {
         if (item instanceof TieredItem tieredItem) return McTier.wrap(tieredItem);
         return null;
     }
@@ -101,7 +105,8 @@ public class ItemApi {
      * @param bukkitItemStack Bukkit ItemStack to wrap
      * @return Wrapped version of ItemStack
      */
-    public static McItemStack getWrappedItemStack(org.bukkit.inventory.ItemStack bukkitItemStack) {
+    @NotNull
+    public static McItemStack getWrappedItemStack(@NotNull org.bukkit.inventory.ItemStack bukkitItemStack) {
         return McItemStack.wrap(bukkitItemStack);
     }
 
@@ -111,7 +116,8 @@ public class ItemApi {
      * @param item Item to wrap
      * @return Wrapped version of Item
      */
-    public static McItem getWrappedItem(Item item) {
+    @NotNull
+    public static McItem getWrappedItem(@NotNull Item item) {
         return McItem.wrap(item);
     }
 
