@@ -90,7 +90,7 @@ public class WorldApi {
     }
 
     /**
-     * Fill a biome between 2 locations.
+     * Fill a Biome between 2 locations.
      * <p>Will also send biome updates to players.</p>
      *
      * @param location  First corner
@@ -98,6 +98,19 @@ public class WorldApi {
      * @param biomeKey  Key of biome
      */
     public static void fillBiome(@NotNull Location location, @NotNull Location location2, @NotNull NamespacedKey biomeKey) {
+        fillBiome(location, location2, biomeKey, null);
+    }
+
+    /**
+     * Fill a Biome between 2 locations with an option to only replace a specific Biome.
+     * <p>Will also send biome updates to players.</p>
+     *
+     * @param location   First corner
+     * @param location2  Second corner
+     * @param biomeKey   Key of biome
+     * @param replaceKey Key of biome to replace
+     */
+    public static void fillBiome(@NotNull Location location, @NotNull Location location2, @NotNull NamespacedKey biomeKey, @Nullable NamespacedKey replaceKey) {
         World world = location.getWorld();
         if (world != location2.getWorld()) {
             throw new IllegalArgumentException("Worlds for both locations do not match!");
@@ -109,6 +122,7 @@ public class WorldApi {
         ServerLevel level = McUtils.getServerLevel(world);
 
         Holder.Reference<Biome> biome = McUtils.getHolderReference(BIOME_REGISTRY, biomeKey);
+        ResourceLocation replaceBiome = replaceKey != null ? McUtils.getResourceLocation(replaceKey) : null;
         if (biome == null) return;
 
         List<ChunkAccess> chunkAccessList = new ArrayList<>();
@@ -120,7 +134,8 @@ public class WorldApi {
         }
 
         for (ChunkAccess chunkAccess : chunkAccessList) {
-            chunkAccess.fillBiomesFromNoise(McUtils.getBiomeResolver(new MutableInt(0), chunkAccess, box, biome, f -> true), level.getChunkSource().randomState().sampler());
+            chunkAccess.fillBiomesFromNoise(McUtils.getBiomeResolver(new MutableInt(0), chunkAccess, box, biome,
+                    biomeHolder -> replaceBiome == null || biomeHolder.is(replaceBiome)), level.getChunkSource().randomState().sampler());
             chunkAccess.setUnsaved(true);
         }
         level.getChunkSource().chunkMap.resendBiomesForChunks(chunkAccessList);
