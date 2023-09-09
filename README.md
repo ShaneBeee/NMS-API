@@ -3,7 +3,7 @@
 NMS-API is a simple library of utility shortcuts for simple NMS things.
 
 ## JavaDocs
-Check out the [**JavaDocs**](https://shanebeee.github.io/NMS-API/)
+Check out the [**JavaDocs**](https://shanebeee.github.io/docs/NMS-API/)
 
 ## Versions
 Currently this library will only supported limited versions of Minecraft.

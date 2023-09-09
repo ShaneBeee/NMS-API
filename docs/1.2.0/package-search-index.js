@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.shanebeestudios.nms.api.util"},{"l":"com.shanebeestudios.nms.api.world"},{"l":"com.shanebeestudios.nms.api.world.entity"}];updateSearchResults();
