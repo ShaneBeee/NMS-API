@@ -5,6 +5,7 @@ import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import com.shanebeestudios.nms.api.util.McUtils;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -46,7 +47,7 @@ public class PlayerApi {
         ServerLevel level = McUtils.getServerLevel(world);
 
         OfflinePlayer op = Bukkit.getOfflinePlayer(name);
-        ServerPlayer serverPlayer = new ServerPlayer(MINECRAFT_SERVER, level, new GameProfile(op.getUniqueId(), name));
+        ServerPlayer serverPlayer = new ServerPlayer(MINECRAFT_SERVER, level, new GameProfile(op.getUniqueId(), name), ClientInformation.createDefault());
         serverPlayer.setPos(loc.getX(), loc.getY(), loc.getZ());
 
         FakePlayer fakePlayer = new FakePlayer(serverPlayer);

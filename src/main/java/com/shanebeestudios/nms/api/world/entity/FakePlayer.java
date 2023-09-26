@@ -1,17 +1,19 @@
 package com.shanebeestudios.nms.api.world.entity;
 
 import com.shanebeestudios.nms.api.util.McUtils;
-import net.minecraft.network.protocol.game.ClientboundAddPlayerPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.Entry;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.level.GameType;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -24,10 +26,13 @@ import java.util.List;
 public class FakePlayer {
 
     private final ServerPlayer fakeServerPlayer;
+    private final Entry fakePlayerEntry;
     private final int id;
 
     FakePlayer(ServerPlayer serverPlayer) {
         this.fakeServerPlayer = serverPlayer;
+        this.fakePlayerEntry = new Entry(this.fakeServerPlayer.getUUID(), this.fakeServerPlayer.getGameProfile(), true, 0,
+                GameType.CREATIVE, this.fakeServerPlayer.getDisplayName(), null);
         this.id = serverPlayer.getId();
     }
 
@@ -44,9 +49,9 @@ public class FakePlayer {
 
     private void update(ServerPlayer serverPlayer) {
         ServerGamePacketListenerImpl connection = serverPlayer.connection;
-        connection.send(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, this.fakeServerPlayer));
-        connection.send(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED, this.fakeServerPlayer));
-        connection.send(new ClientboundAddPlayerPacket(this.fakeServerPlayer));
+        connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, ClientboundPlayerInfoUpdatePacket.Action.INITIALIZE_CHAT, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_GAME_MODE, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LATENCY, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME), this.fakePlayerEntry));
+        connection.send(this.fakeServerPlayer.getAddEntityPacket());
+        // TODO still broken, skin is missing
     }
 
     /**
@@ -82,8 +87,7 @@ public class FakePlayer {
     public void addToPlayerList() {
         MinecraftServer.getServer().getPlayerList().players.forEach(serverPlayer -> {
             ServerGamePacketListenerImpl connection = serverPlayer.connection;
-            connection.send(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, this.fakeServerPlayer));
-            connection.send(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED, this.fakeServerPlayer));
+            connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED), this.fakePlayerEntry));
         });
     }
 
