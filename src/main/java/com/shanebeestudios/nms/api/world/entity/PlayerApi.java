@@ -47,7 +47,9 @@ public class PlayerApi {
         ServerLevel level = McUtils.getServerLevel(world);
 
         OfflinePlayer op = Bukkit.getOfflinePlayer(name);
-        ServerPlayer serverPlayer = new ServerPlayer(MINECRAFT_SERVER, level, new GameProfile(op.getUniqueId(), name), ClientInformation.createDefault());
+        GameProfile gameProfile = new GameProfile(op.getUniqueId(), name);
+        McUtils.setSkin(name, gameProfile);
+        ServerPlayer serverPlayer = new ServerPlayer(MINECRAFT_SERVER, level, gameProfile, ClientInformation.createDefault());
         serverPlayer.setPos(loc.getX(), loc.getY(), loc.getZ());
 
         FakePlayer fakePlayer = new FakePlayer(serverPlayer);

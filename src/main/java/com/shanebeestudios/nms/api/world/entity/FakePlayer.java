@@ -52,7 +52,6 @@ public class FakePlayer {
         connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER), this.fakePlayerEntry));
         connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED), this.fakePlayerEntry));
         connection.send(this.fakeServerPlayer.getAddEntityPacket());
-        // TODO still broken, skin is missing
     }
 
     /**

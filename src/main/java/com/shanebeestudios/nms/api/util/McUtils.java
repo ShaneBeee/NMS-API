@@ -1,5 +1,10 @@
 package com.shanebeestudios.nms.api.util;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
 import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import net.minecraft.core.BlockPos;
@@ -32,9 +37,12 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -310,6 +318,50 @@ public class McUtils {
                 return biomeHolder;
             }
         };
+    }
+
+
+    /**
+     * Set the skin of a GameProfile
+     *
+     * @param name        Name of player
+     * @param gameProfile Profile to set
+     */
+    // Courtesy of Jonas2004
+    // https://www.spigotmc.org/threads/create-fake-player-1-20-2.621480/#post-4649259
+    public static void setSkin(String name, GameProfile gameProfile) {
+        Gson gson = new Gson();
+        String url = "https://api.mojang.com/users/profiles/minecraft/" + name;
+        String json = getStringFromURL(url);
+        String uuid = gson.fromJson(json, JsonObject.class).get("id").getAsString();
+
+        url = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false";
+        json = getStringFromURL(url);
+        JsonObject mainObject = gson.fromJson(json, JsonObject.class);
+        JsonObject jsonObject = mainObject.get("properties").getAsJsonArray().get(0).getAsJsonObject();
+        String value = jsonObject.get("value").getAsString();
+        String signature = jsonObject.get("signature").getAsString();
+        PropertyMap propertyMap = gameProfile.getProperties();
+        propertyMap.put("name", new Property("name", name));
+        propertyMap.put("textures", new Property("textures", value, signature));
+    }
+
+    private static String getStringFromURL(String url) {
+        StringBuilder text = new StringBuilder();
+        try {
+            Scanner scanner = new Scanner(new URL(url).openStream());
+            while (scanner.hasNext()) {
+                String line = scanner.nextLine();
+                while (line.startsWith(" ")) {
+                    line = line.substring(1);
+                }
+                text.append(line);
+            }
+            scanner.close();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        return text.toString();
     }
 
 }
