@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Api methods pertaining to a {@link org.bukkit.entity.Player}
@@ -56,6 +57,39 @@ public class PlayerApi {
         FAKE_PLAYERS.put(name, fakePlayer);
         fakePlayer.update();
         return fakePlayer;
+    }
+
+    /**
+     * Spawn a {@link FakePlayer} async
+     * <p>This will cache the fake player as well for later retrieval</p>
+     *
+     * @param name Name of fake player
+     * @param loc  Location of fake player
+     * @return FakePlayer instance
+     */
+    public static CompletableFuture<FakePlayer> spawnFakePlayerAsync(String name, Location loc) {
+        World world = loc.getWorld() != null ? loc.getWorld() : Bukkit.getWorlds().get(0);
+        ServerLevel level = McUtils.getServerLevel(world);
+
+        CompletableFuture<FakePlayer> fakePlayerFuture = new CompletableFuture<>();
+        CompletableFuture<GameProfile> skinFuture = CompletableFuture.supplyAsync(() -> {
+            OfflinePlayer op = Bukkit.getOfflinePlayer(name);
+            GameProfile gameProfile = new GameProfile(op.getUniqueId(), name);
+            McUtils.setSkin(name, gameProfile);
+            return gameProfile;
+        });
+
+        skinFuture.thenAccept(gameProfile -> {
+            ServerPlayer serverPlayer = new ServerPlayer(MINECRAFT_SERVER, level, gameProfile, ClientInformation.createDefault());
+            serverPlayer.setPos(loc.getX(), loc.getY(), loc.getZ());
+
+            FakePlayer fakePlayer = new FakePlayer(serverPlayer);
+            FAKE_PLAYERS.put(name, fakePlayer);
+            fakePlayer.update();
+            fakePlayerFuture.complete(fakePlayer);
+        });
+
+        return fakePlayerFuture;
     }
 
     /**
