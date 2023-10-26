@@ -6,6 +6,9 @@ import com.shanebeestudios.nms.api.util.McUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -102,6 +105,26 @@ public class ChunkApi {
         int z = (chunk.getZ() << 4) + 7;
         Location location = new Location(world, x, 1, z);
         return isTickingAtLocation(location);
+    }
+
+    /**
+     * Get the effective difficulty of a Chunk
+     * <p>This is what is seen in the debug screen under "Local Difficulty"</p>
+     *
+     * @param chunk Chunk to grab effective difficulty from
+     * @return Effective difficulty of chunk
+     */
+    public static float getEffectiveDifficulty(Chunk chunk) {
+        LevelChunk levelChunk = getLevelChunk(chunk);
+        Level level = levelChunk.getLevel();
+
+        Difficulty difficulty = level.getDifficulty();
+        long dayTime = level.getDayTime();
+        long inhabitedTime = levelChunk.getInhabitedTime();
+        float moonBrightness = level.getMoonBrightness();
+
+        DifficultyInstance difficultyInstance = new DifficultyInstance(difficulty, dayTime, inhabitedTime, moonBrightness);
+        return difficultyInstance.getEffectiveDifficulty();
     }
 
 }
