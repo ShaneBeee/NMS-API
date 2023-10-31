@@ -5,6 +5,7 @@ import com.shanebeestudios.nms.api.util.McUtils;
 import com.shanebeestudios.nms.api.world.item.ItemApi;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
@@ -132,6 +133,25 @@ public class BlockApi {
             }
         }
         return null;
+    }
+
+    /**
+     * Randomly tick a block.
+     * <p>This does the same thing Minecraft does when it picks blocks to randomly tick,
+     * for example crops, leaf decay and farmland moisture.</p>
+     * <p>NOTE: If the block does not have any ticking code (ex: stone), nothing will happen.</p>
+     *
+     * @param bukkitBlock Block to randomly tick
+     */
+    @SuppressWarnings("deprecation")
+    public static void randomlyTick(Block bukkitBlock) {
+        BlockState blockState = McUtils.getBlockStateFromBlock(bukkitBlock);
+        net.minecraft.world.level.block.Block block = blockState.getBlock();
+
+        Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(bukkitBlock.getLocation());
+        ServerLevel level = levelPos.getFirst();
+
+        block.randomTick(blockState, level, levelPos.getSecond(), level.getRandom());
     }
 
 }
