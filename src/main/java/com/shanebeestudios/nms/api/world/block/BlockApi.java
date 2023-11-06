@@ -154,18 +154,4 @@ public class BlockApi {
         block.randomTick(blockState, level, levelPos.getSecond(), level.getRandom());
     }
 
-    /**
-     * Check if a BlockData can survive at a location
-     * <p>Example of this would be checking if sand is supported or a block can be placed over farmland/dirt path</p>
-     *
-     * @param blockData BlockData to check for survival
-     * @param location  Location to check for survival
-     * @return True if this BlockData can survive at this Location
-     */
-    public boolean canSurvive(BlockData blockData, Location location) {
-        BlockState state = McUtils.getBlockStateFromData(blockData);
-        Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(location);
-        return state.canSurvive(levelPos.getFirst(), levelPos.getSecond());
-    }
-
 }
