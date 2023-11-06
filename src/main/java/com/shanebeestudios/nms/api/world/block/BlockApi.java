@@ -154,4 +154,18 @@ public class BlockApi {
         block.randomTick(blockState, level, levelPos.getSecond(), level.getRandom());
     }
 
+    /**
+     * Get the destroy progress of a specific Block by a Player
+     *
+     * @param player      Player to check for progress
+     * @param bukkitBlock Block to check for progress
+     * @return Destroy progress of block by player
+     */
+    public static float getDestroyProgress(Player player, Block bukkitBlock) {
+        BlockState state = McUtils.getBlockStateFromBlock(bukkitBlock);
+        Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(bukkitBlock.getLocation());
+        ServerPlayer serverPlayer = McUtils.getServerPlayer(player);
+        return state.getDestroyProgress(serverPlayer, levelPos.getFirst(), levelPos.getSecond());
+    }
+
 }
