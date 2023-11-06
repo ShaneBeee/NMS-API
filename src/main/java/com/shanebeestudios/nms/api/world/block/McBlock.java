@@ -16,10 +16,24 @@ import org.jetbrains.annotations.Nullable;
 @SuppressWarnings("unused")
 public class McBlock {
 
+    /**
+     * Wrap a Minecraft Block as an McBlock
+     *
+     * @param block Minecraft block to wrap
+     * @return Wrapper for Minecraft Block
+     */
     public static McBlock wrap(Block block) {
         return new McBlock(block);
     }
 
+    /**
+     * Wrap a Bukkit Block as an McBlock
+     * <p>Being different Block classes,
+     * this essentially grabs the type of a Bukkit Block</p>
+     *
+     * @param bukkitBlock Bukkit Block to wrap
+     * @return Wrapper for Minecraft Block
+     */
     public static McBlock wrap(org.bukkit.block.Block bukkitBlock) {
         BlockState blockState = McUtils.getBlockStateFromBlock(bukkitBlock);
         Block block = blockState.getBlock();

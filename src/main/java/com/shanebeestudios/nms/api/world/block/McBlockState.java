@@ -22,10 +22,22 @@ import org.bukkit.entity.Entity;
 @SuppressWarnings("unused")
 public class McBlockState {
 
+    /**
+     * Wrap a Minecraft BlockState as an McBlockState
+     *
+     * @param blockState BlockState to wrap
+     * @return Wrapper for Minecraft BlockState
+     */
     public static McBlockState wrap(BlockState blockState) {
         return new McBlockState(blockState);
     }
 
+    /**
+     * Wrap a Bukkit BlockData as a Minecraft BlockState
+     *
+     * @param blockData BlockData to wrap
+     * @return Wrapper for Minecraft BlockState
+     */
     public static McBlockState wrap(BlockData blockData) {
         BlockState blockState = McUtils.getBlockStateFromData(blockData);
         return wrap(blockState);

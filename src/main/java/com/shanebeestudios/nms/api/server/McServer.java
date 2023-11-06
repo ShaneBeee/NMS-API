@@ -17,8 +17,14 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class McServer {
 
-    public static McServer wrap(Server server) {
-        return new McServer(McUtils.getMinecraftServer(server));
+    /**
+     * Wrap a Bukkit Server as MinecraftServer
+     *
+     * @param bukkitServer Bukkit Server to wrap
+     * @return Wrapped MinecraftServer
+     */
+    public static McServer wrap(Server bukkitServer) {
+        return new McServer(McUtils.getMinecraftServer(bukkitServer));
     }
 
     private final DedicatedServer server;
