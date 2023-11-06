@@ -15,6 +15,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
@@ -29,6 +30,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -362,6 +364,14 @@ public class McUtils {
             exception.printStackTrace();
         }
         return text.toString();
+    }
+
+    /** Get the Minecraft Server
+     * @param server Bukkit Server to convert to Minecraft Server
+     * @return Minecraft Server from Bukkit Server
+     */
+    public static DedicatedServer getMinecraftServer(Server server) {
+        return ReflectionShortcuts.getMinecraftServer(server);
     }
 
 }

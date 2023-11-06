@@ -1,5 +1,6 @@
 package com.shanebeestudios.nms.api.reflection;
 
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
@@ -13,6 +14,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -46,6 +48,8 @@ public class ReflectionShortcuts {
     private static final Method CRAFT_BLOCK_GET_NMS_METHOD;
     private static final Class<?> CRAFT_MAGIC_NUMBERS_CLASS;
     private static final Method CRAFT_MAGIC_NUMBERS_ITEM_METHOD;
+    private static final Class<?> CRAFT_SERVER_CLASS;
+    private static final Method CRAFT_SERVER_GET_SERVER_METHOD;
 
     static {
         try {
@@ -56,6 +60,7 @@ public class ReflectionShortcuts {
             CRAFT_BLOCK_DATA_CLASS = ReflectionUtils.getOBCClass("block.data.CraftBlockData");
             CRAFT_BLOCK_CLASS = ReflectionUtils.getOBCClass("block.CraftBlock");
             CRAFT_MAGIC_NUMBERS_CLASS = ReflectionUtils.getOBCClass("util.CraftMagicNumbers");
+            CRAFT_SERVER_CLASS = ReflectionUtils.getOBCClass("CraftServer");
             assert CRAFT_REGION_ACCESSOR_CLASS != null;
             assert CRAFT_WORLD_CLASS != null;
             assert CRAFT_CHUNK_CLASS != null;
@@ -63,6 +68,7 @@ public class ReflectionShortcuts {
             assert CRAFT_BLOCK_DATA_CLASS != null;
             assert CRAFT_BLOCK_CLASS != null;
             assert CRAFT_MAGIC_NUMBERS_CLASS != null;
+            assert CRAFT_SERVER_CLASS != null;
             CRAFT_WORLD_GET_HANDLE_METHOD = CRAFT_WORLD_CLASS.getMethod("getHandle");
             CRAFT_REGION_GET_HANDLE_METHOD = CRAFT_REGION_ACCESSOR_CLASS.getMethod("getHandle");
             CRAFT_CHUNK_GET_HANDLE_METHOD = CRAFT_CHUNK_CLASS.getMethod("getHandle", ChunkStatus.class);
@@ -72,6 +78,7 @@ public class ReflectionShortcuts {
             CRAFT_BLOCK_DATA_GET_STATE_METHOD = CRAFT_BLOCK_DATA_CLASS.getMethod("getState");
             CRAFT_BLOCK_GET_NMS_METHOD = CRAFT_BLOCK_CLASS.getMethod("getNMS");
             CRAFT_MAGIC_NUMBERS_ITEM_METHOD = CRAFT_MAGIC_NUMBERS_CLASS.getMethod("getItem", Material.class);
+            CRAFT_SERVER_GET_SERVER_METHOD = CRAFT_SERVER_CLASS.getMethod("getServer");
         } catch (NoSuchMethodException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
@@ -199,6 +206,14 @@ public class ReflectionShortcuts {
             if (blockStateObject instanceof BlockState blockState) return blockState;
             return Blocks.AIR.defaultBlockState();
         } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static DedicatedServer getMinecraftServer(Server server) {
+        try {
+            return (DedicatedServer) CRAFT_SERVER_GET_SERVER_METHOD.invoke(server);
+        } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
