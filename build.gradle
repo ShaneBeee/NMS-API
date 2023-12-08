@@ -7,7 +7,7 @@ plugins {
 // The Minecraft version we're currently building for
 def minecraftVersion = '1.20.4'
 // Version of NMS-API
-def projectVersion = '1.4.0'
+def projectVersion = '1.5.0'
 
 compileJava {
     sourceCompatibility = '17'
