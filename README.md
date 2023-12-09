@@ -2,10 +2,13 @@
 
 NMS-API is a simple library of utility shortcuts for simple NMS things.
 
-## JavaDocs
+## Requirements:
+A PaperMC server is required as this API is built using Paper's PaperWeight system.
+
+## JavaDocs:
 Check out the [**JavaDocs**](https://shanebeee.github.io/docs/NMS-API/)
 
-## Versions
+## Versions:
 Currently this library will only supported limited versions of Minecraft.
 
 ### Current:
