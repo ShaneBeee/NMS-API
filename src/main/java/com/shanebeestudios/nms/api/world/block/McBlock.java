@@ -5,6 +5,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -117,7 +118,9 @@ public class McBlock {
      *
      * @param bukkitBlock Bukkit Block to check if MC Block is randomly ticking
      * @return True if randomly ticking
+     * @deprecated See Paper's new method {@link BlockData#isRandomlyTicked()}
      */
+    @Deprecated(forRemoval = true,since = "Dec 9/2023")
     public boolean isRandomlyTicking(org.bukkit.block.Block bukkitBlock) {
         BlockState blockState = McUtils.getBlockStateFromBlock(bukkitBlock);
         return this.block.isRandomlyTicking(blockState);
