@@ -54,7 +54,8 @@ publishing {
 javadoc {
     destinationDir = file("${buildDir}/javadoc")
     options {
-        links('https://hub.spigotmc.org/javadocs/spigot/')
+        def javadocVer = Arrays.copyOfRange(minecraftVersion.split("\\."), 0, 2).join(".")
+        links("https://jd.papermc.io/paper/" + javadocVer)
         title("NMS-API - ${projectVersion}")
     }
     exclude('com/shanebeestudios/nms/api/reflection')
