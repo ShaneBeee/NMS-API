@@ -1,5 +1,6 @@
 package com.shanebeestudios.nms.api.world.entity;
 
+import com.mojang.authlib.GameProfile;
 import com.shanebeestudios.nms.api.util.McUtils;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
@@ -101,6 +102,33 @@ public class FakePlayer {
             connection.send(new ClientboundRemoveEntitiesPacket(this.id));
             connection.send(new ClientboundPlayerInfoRemovePacket(List.of(this.fakeServerPlayer.getUUID())));
         });
+    }
+
+    /**
+     * Get the Minecraft Player of this FakePlayer
+     *
+     * @return Minecraft Player
+     */
+    public net.minecraft.world.entity.player.Player getServerPlayer() {
+        return this.fakeServerPlayer;
+    }
+
+    /**
+     * Get the GameProfile of this FakePlayer
+     *
+     * @return GameProfile
+     */
+    public GameProfile getGameProfile() {
+        return this.fakeServerPlayer.getGameProfile();
+    }
+
+    /**
+     * Get the name of this FakePlayer
+     *
+     * @return Name
+     */
+    public String getName() {
+        return this.fakeServerPlayer.getGameProfile().getName();
     }
 
     @Override
