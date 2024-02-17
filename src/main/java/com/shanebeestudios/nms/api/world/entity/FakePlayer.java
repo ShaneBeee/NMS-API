@@ -11,11 +11,13 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -30,15 +32,23 @@ import java.util.List;
 public class FakePlayer {
 
     private final ServerPlayer fakeServerPlayer;
+    private final Entity attachedEntity;
     private final Entry fakePlayerEntry;
     private final int id;
     private McPlayer mcPlayer;
+    private McEntity attachedMcEntity;
 
     FakePlayer(ServerPlayer serverPlayer) {
+        this(serverPlayer, null);
+    }
+
+    FakePlayer(ServerPlayer serverPlayer, Entity attachedEntity) {
+        if (attachedEntity != null) serverPlayer.setId(attachedEntity.getId());
         this.fakeServerPlayer = serverPlayer;
         this.fakePlayerEntry = new Entry(this.fakeServerPlayer.getUUID(), this.fakeServerPlayer.getGameProfile(), true, 0,
                 GameType.CREATIVE, this.fakeServerPlayer.getDisplayName(), null);
         this.id = serverPlayer.getId();
+        this.attachedEntity = attachedEntity;
     }
 
     /**
@@ -54,27 +64,74 @@ public class FakePlayer {
     }
 
     /**
+     * Get the Entity this FakePlayer may be attached to
+     * <p>May be null if this FakePlayer was never attached</p>
+     *
+     * @return Attached entity if present else null
+     */
+    @Nullable
+    public Entity getAttachedEntity() {
+        return this.attachedEntity;
+    }
+
+    /**
+     * Get the Bukkit Entity this FakePlayer may be attached to
+     * <p>May be null if this FakePlayer was never attached</p>
+     *
+     * @return Attached Bukkit Entity if present else null
+     */
+    public org.bukkit.entity.Entity getAttachedBukkitEntity() {
+        if (this.attachedEntity != null) return this.attachedEntity.getBukkitEntity();
+        return null;
+    }
+
+    /**
+     * Get an McEntity this FakePlayer may be attached to
+     * <p>May be null if this FakePlayer was never attached</p>
+     *
+     * @return Attached McEntity if present else null
+     */
+    @Nullable
+    public McEntity getAttachedMcEntity() {
+        if (this.attachedEntity != null) {
+            if (this.attachedMcEntity == null) {
+                this.attachedMcEntity = McEntity.wrap(this.attachedEntity);
+            }
+            return this.attachedMcEntity;
+        }
+        return null;
+    }
+
+    /**
      * Teleport this player to another location
      * <p>Currently does not support changing worlds/levels.</p>
+     * <p>NOTE: If there is an attached entity, its best to just teleport that entity instead.</p>
      *
      * @param location Location to teleport to
      */
     public void teleport(@NotNull Location location) {
-        this.fakeServerPlayer.absMoveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-        update();
+        Entity entityToMove = this.attachedEntity != null ? this.attachedEntity : this.fakeServerPlayer;
+        entityToMove.absMoveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+        if (this.attachedEntity == null) update();
     }
 
     /**
      * Move this player to a new location
      * <p>NOTE: Should be <= 8 blocks, this is used for general player movement, not teleporting</p>
+     * <p>NOTE: If there is an attached entity, just move/teleport that entity instead.</p>
      *
      * @param location Location to move player to
      */
     public void moveTo(@NotNull Location location) {
+        Entity entityToMove = this.attachedEntity != null ? this.attachedEntity : this.fakeServerPlayer;
+        entityToMove.absMoveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+
+        // If attached entity is found, don't send packets
+        if (this.attachedEntity != null) return;
         double oldX = this.fakeServerPlayer.getX();
         double oldY = this.fakeServerPlayer.getY();
         double oldZ = this.fakeServerPlayer.getZ();
-        this.fakeServerPlayer.absMoveTo(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+
         Vec3 vec3 = new Vec3(location.getX() - oldX, location.getY() - oldY, location.getZ() - oldZ);
         short x = (short) this.fakeServerPlayer.getPositionCodec().encodeX(vec3);
         short y = (short) this.fakeServerPlayer.getPositionCodec().encodeY(vec3);

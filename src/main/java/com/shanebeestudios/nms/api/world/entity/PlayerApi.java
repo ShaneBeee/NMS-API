@@ -4,15 +4,19 @@ import com.mojang.authlib.GameProfile;
 import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import com.shanebeestudios.nms.api.util.McUtils;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.entity.Entity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +47,22 @@ public class PlayerApi {
      * @return FakePlayer instance
      */
     public static FakePlayer spawnFakePlayer(String name, Location loc) {
+        return spawnFakePlayer(name, loc, null);
+    }
+
+    /**
+     * Spawn a {@link FakePlayer}
+     * <p>This will cache the fake player as well for later retrieval</p>
+     * <p>NOTE: The attached entity will spawn, and the player will take over its AI,
+     * This may cause some client lag depending on the chosen entity.</p>
+     *
+     * @param name       Name of fake player
+     * @param loc        Location of fake player
+     * @param attachType Type of entity to spawn and attach the player to
+     * @return FakePlayer instance
+     */
+    public static FakePlayer spawnFakePlayer(@NotNull String name, @NotNull Location loc, @Nullable EntityType attachType) {
+        // create player entity
         World world = loc.getWorld() != null ? loc.getWorld() : Bukkit.getWorlds().get(0);
         ServerLevel level = McUtils.getServerLevel(world);
 
@@ -52,39 +72,29 @@ public class PlayerApi {
         ServerPlayer serverPlayer = new ServerPlayer(MINECRAFT_SERVER, level, gameProfile, ClientInformation.createDefault());
         serverPlayer.setPos(loc.getX(), loc.getY(), loc.getZ());
 
-        FakePlayer fakePlayer = new FakePlayer(serverPlayer);
+        // Attempt attachment
+        Entity attachedEntity = null;
+        if (attachType != null) {
+            Class<? extends org.bukkit.entity.Entity> entityClass = attachType.getEntityClass();
+            assert entityClass != null;
+            if (!LivingEntity.class.isAssignableFrom(entityClass)) {
+                throw new IllegalArgumentException("Cannot use a non-living entity");
+            }
+            // Spawn entity used for attachment
+            org.bukkit.entity.Entity spawn = loc.getWorld().spawn(loc, entityClass);
+            attachedEntity = ReflectionShortcuts.getNMSEntity(spawn);
+
+            // Visual remove that entity from the client
+            ClientboundRemoveEntitiesPacket removePacket = new ClientboundRemoveEntitiesPacket(attachedEntity.getId());
+            Bukkit.getOnlinePlayers().forEach(player -> sendPacket(player, removePacket));
+        }
+
+        // Create fake player and update to all clients
+        FakePlayer fakePlayer = new FakePlayer(serverPlayer, attachedEntity);
         FAKE_PLAYERS.put(name, fakePlayer);
         fakePlayer.update();
         return fakePlayer;
     }
-
-    // TODO come back to this later
-//    public static void spawnFakeVillager(String name, Location loc) {
-//        Villager bukkitVillager = loc.getWorld().spawn(loc, Villager.class);
-//        int villagerID = bukkitVillager.getEntityId();
-//        ClientboundRemoveEntitiesPacket removePacket = new ClientboundRemoveEntitiesPacket(villagerID);
-//        MinecraftServer.getServer().getPlayerList().players.forEach(p -> p.connection.send(removePacket));
-//
-//        World world = loc.getWorld() != null ? loc.getWorld() : Bukkit.getWorlds().get(0);
-//        ServerLevel level = McUtils.getServerLevel(world);
-//
-//        OfflinePlayer op = Bukkit.getOfflinePlayer(name);
-//        GameProfile gameProfile = new GameProfile(op.getUniqueId(), name);
-//        McUtils.setSkin(name, gameProfile);
-//        ServerPlayer serverPlayer = new ServerPlayer(MINECRAFT_SERVER, level, gameProfile, ClientInformation.createDefault());
-//        serverPlayer.setPos(loc.getX(), loc.getY(), loc.getZ());
-//        serverPlayer.setId(villagerID);
-//
-//        ClientboundPlayerInfoUpdatePacket.Entry entry = new ClientboundPlayerInfoUpdatePacket.Entry(serverPlayer.getUUID(), serverPlayer.getGameProfile(), true, 0,
-//                GameType.CREATIVE, serverPlayer.getDisplayName(), null);
-//
-//        MinecraftServer.getServer().getPlayerList().players.forEach(player -> {
-//            ServerGamePacketListenerImpl connection = player.connection;
-//            connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER), entry));
-//            connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED), entry));
-//            connection.send(serverPlayer.getAddEntityPacket());
-//        });
-//    }
 
     /**
      * Spawn a {@link FakePlayer} async
@@ -95,6 +105,22 @@ public class PlayerApi {
      * @return FakePlayer instance
      */
     public static CompletableFuture<FakePlayer> spawnFakePlayerAsync(String name, Location loc) {
+        return spawnFakePlayerAsync(name, loc, null);
+    }
+
+    /**
+     * Spawn a {@link FakePlayer} async
+     * <p>This will cache the fake player as well for later retrieval</p>
+     * <p>NOTE: The attached entity will spawn, and the player will take over its AI,
+     * This may cause some client lag depending on the chosen entity.</p>
+     *
+     * @param name       Name of fake player
+     * @param loc        Location of fake player
+     * @param attachType Type of entity to spawn and attach the player to
+     * @return FakePlayer instance
+     */
+    public static CompletableFuture<FakePlayer> spawnFakePlayerAsync(@NotNull String name, @NotNull Location loc, @Nullable EntityType attachType) {
+        // create fake player
         World world = loc.getWorld() != null ? loc.getWorld() : Bukkit.getWorlds().get(0);
         ServerLevel level = McUtils.getServerLevel(world);
 
@@ -110,7 +136,23 @@ public class PlayerApi {
             ServerPlayer serverPlayer = new ServerPlayer(MINECRAFT_SERVER, level, gameProfile, ClientInformation.createDefault());
             serverPlayer.setPos(loc.getX(), loc.getY(), loc.getZ());
 
-            FakePlayer fakePlayer = new FakePlayer(serverPlayer);
+            Entity attachedEntity = null;
+            if (attachType != null) {
+                Class<? extends org.bukkit.entity.Entity> entityClass = attachType.getEntityClass();
+                assert entityClass != null;
+                if (!LivingEntity.class.isAssignableFrom(entityClass)) {
+                    throw new IllegalArgumentException("Cannot use a non-living entity");
+                }
+                // Spawn entity used for attachment
+                org.bukkit.entity.Entity spawn = loc.getWorld().spawn(loc, entityClass);
+                attachedEntity = ReflectionShortcuts.getNMSEntity(spawn);
+
+                // Visually remove that entity from the client
+                ClientboundRemoveEntitiesPacket removePacket = new ClientboundRemoveEntitiesPacket(attachedEntity.getId());
+                Bukkit.getOnlinePlayers().forEach(player -> sendPacket(player, removePacket));
+            }
+
+            FakePlayer fakePlayer = new FakePlayer(serverPlayer, attachedEntity);
             FAKE_PLAYERS.put(name, fakePlayer);
             fakePlayer.update();
             fakePlayerFuture.complete(fakePlayer);
