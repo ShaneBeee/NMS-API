@@ -124,6 +124,27 @@ public class PlayerApi {
         World world = loc.getWorld() != null ? loc.getWorld() : Bukkit.getWorlds().get(0);
         ServerLevel level = McUtils.getServerLevel(world);
 
+        // Spawn attachment if necessary
+        Entity attachedEntity;
+        if (attachType != null) {
+            // Spawn entity used for attachment
+            Class<? extends org.bukkit.entity.Entity> entityClass = attachType.getEntityClass();
+            assert entityClass != null;
+            if (!LivingEntity.class.isAssignableFrom(entityClass)) {
+                throw new IllegalArgumentException("Cannot use a non-living entity");
+            }
+
+            org.bukkit.entity.Entity spawnedEntity = loc.getWorld().spawn(loc, entityClass);
+            attachedEntity = ReflectionShortcuts.getNMSEntity(spawnedEntity);
+
+            // Visually remove that entity from the client
+            ClientboundRemoveEntitiesPacket removePacket = new ClientboundRemoveEntitiesPacket(attachedEntity.getId());
+            Bukkit.getOnlinePlayers().forEach(player -> sendPacket(player, removePacket));
+        } else {
+            attachedEntity = null;
+        }
+
+        // Create Skin/GameProfile
         CompletableFuture<FakePlayer> fakePlayerFuture = new CompletableFuture<>();
         CompletableFuture<GameProfile> skinFuture = CompletableFuture.supplyAsync(() -> {
             OfflinePlayer op = Bukkit.getOfflinePlayer(name);
@@ -132,33 +153,17 @@ public class PlayerApi {
             return gameProfile;
         });
 
-        skinFuture.thenAccept(gameProfile -> {
+        // Finally create FakePlayer and apply skin
+        return skinFuture.thenApply(gameProfile -> {
             ServerPlayer serverPlayer = new ServerPlayer(MINECRAFT_SERVER, level, gameProfile, ClientInformation.createDefault());
             serverPlayer.setPos(loc.getX(), loc.getY(), loc.getZ());
-
-            Entity attachedEntity = null;
-            if (attachType != null) {
-                Class<? extends org.bukkit.entity.Entity> entityClass = attachType.getEntityClass();
-                assert entityClass != null;
-                if (!LivingEntity.class.isAssignableFrom(entityClass)) {
-                    throw new IllegalArgumentException("Cannot use a non-living entity");
-                }
-                // Spawn entity used for attachment
-                org.bukkit.entity.Entity spawn = loc.getWorld().spawn(loc, entityClass);
-                attachedEntity = ReflectionShortcuts.getNMSEntity(spawn);
-
-                // Visually remove that entity from the client
-                ClientboundRemoveEntitiesPacket removePacket = new ClientboundRemoveEntitiesPacket(attachedEntity.getId());
-                Bukkit.getOnlinePlayers().forEach(player -> sendPacket(player, removePacket));
-            }
 
             FakePlayer fakePlayer = new FakePlayer(serverPlayer, attachedEntity);
             FAKE_PLAYERS.put(name, fakePlayer);
             fakePlayer.update();
             fakePlayerFuture.complete(fakePlayer);
+            return fakePlayer;
         });
-
-        return fakePlayerFuture;
     }
 
     /**
