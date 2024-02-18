@@ -86,7 +86,7 @@ public class PlayerApi {
 
             // Visual remove that entity from the client
             ClientboundRemoveEntitiesPacket removePacket = new ClientboundRemoveEntitiesPacket(attachedEntity.getId());
-            Bukkit.getOnlinePlayers().forEach(player -> sendPacket(player, removePacket));
+            MinecraftServer.getServer().getPlayerList().players.forEach(player -> player.connection.send(removePacket));
         }
 
         // Create fake player and update to all clients
@@ -139,7 +139,7 @@ public class PlayerApi {
 
             // Visually remove that entity from the client
             ClientboundRemoveEntitiesPacket removePacket = new ClientboundRemoveEntitiesPacket(attachedEntity.getId());
-            Bukkit.getOnlinePlayers().forEach(player -> sendPacket(player, removePacket));
+            MinecraftServer.getServer().getPlayerList().players.forEach(player -> player.connection.send(removePacket));
         } else {
             attachedEntity = null;
         }
