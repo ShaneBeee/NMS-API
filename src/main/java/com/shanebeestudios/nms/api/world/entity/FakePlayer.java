@@ -117,7 +117,7 @@ public class FakePlayer {
 
     /**
      * Move this player to a new location
-     * <p>NOTE: Should be <= 8 blocks, this is used for general player movement, not teleporting</p>
+     * <p>NOTE: Should be &lt;= 8 blocks, this is used for general player movement, not teleporting</p>
      * <p>NOTE: If there is an attached entity, just move/teleport that entity instead.</p>
      *
      * @param location Location to move player to
