@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 /**
  * Api methods pertaining to an {@link org.bukkit.entity.Entity}
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnstableApiUsage"})
 public class EntityApi {
 
     private EntityApi() {
@@ -44,7 +44,9 @@ public class EntityApi {
         return ReflectionShortcuts.getNMSEntity(bukkitEntity);
     }
 
-    /** Get the NMS EntityType from Bukkit EntityType
+    /**
+     * Get the NMS EntityType from Bukkit EntityType
+     *
      * @param bukkitType Bukkit EntityType to convert
      * @return NMS EntityType from Bukkit
      */
@@ -60,7 +62,9 @@ public class EntityApi {
      * @param victim    Victim receiving damage
      * @param damage    Amount of damage
      * @param damageKey NamespacedKey of damage type
+     * @deprecated This is now in Bukkit, see {@link org.bukkit.damage.DamageSource}
      */
+    @Deprecated
     public static void damage(@NotNull org.bukkit.entity.Entity victim, float damage, @Nullable NamespacedKey damageKey) {
         damage(victim, damage, damageKey, null, null, null);
     }
@@ -72,7 +76,9 @@ public class EntityApi {
      * @param damage    Amount of damage
      * @param damageKey NamespacedKey of damage type
      * @param vec       Location of damage
+     * @deprecated This is now in Bukkit, see {@link org.bukkit.damage.DamageSource}
      */
+    @Deprecated
     public static void damage(@NotNull org.bukkit.entity.Entity victim, float damage, @Nullable NamespacedKey damageKey, @Nullable Vector vec) {
         damage(victim, damage, damageKey, null, null, vec);
     }
@@ -84,7 +90,9 @@ public class EntityApi {
      * @param damage       Amount of damage
      * @param damageKey    NamespacedKey of damage type
      * @param directEntity Entity directly damaging entity
+     * @deprecated This is now in Bukkit, see {@link org.bukkit.damage.DamageSource}
      */
+    @Deprecated
     public static void damage(@NotNull org.bukkit.entity.Entity victim, float damage, NamespacedKey damageKey, @Nullable org.bukkit.entity.Entity directEntity) {
         damage(victim, damage, damageKey, directEntity, null, null);
     }
@@ -97,7 +105,9 @@ public class EntityApi {
      * @param damageKey     NamespacedKey of damage type
      * @param directEntity  Entity directly damaging entity
      * @param causingEntity Entity cause damage?!? I have no clue
+     * @deprecated This is now in Bukkit, see {@link org.bukkit.damage.DamageSource}
      */
+    @Deprecated
     public static void damage(@NotNull org.bukkit.entity.Entity victim, float damage, NamespacedKey damageKey, @Nullable org.bukkit.entity.Entity directEntity, @Nullable org.bukkit.entity.Entity causingEntity) {
         damage(victim, damage, damageKey, directEntity, causingEntity, null);
     }
@@ -136,7 +146,9 @@ public class EntityApi {
      * Get a list of all DamageTypes as {@link NamespacedKey NamespacedKeys}
      *
      * @return List of all DamageTypes
+     * @deprecated This is now in Bukkit, see {@link org.bukkit.damage.DamageType}
      */
+    @Deprecated
     public static List<NamespacedKey> getDamageTypeKeys() {
         Registry<DamageType> damageTypes = MinecraftServer.getServer().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
 
