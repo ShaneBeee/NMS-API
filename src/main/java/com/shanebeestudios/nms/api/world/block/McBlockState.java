@@ -2,7 +2,6 @@ package com.shanebeestudios.nms.api.world.block;
 
 import com.mojang.datafixers.util.Pair;
 import com.shanebeestudios.nms.api.util.McUtils;
-import com.shanebeestudios.nms.api.world.entity.EntityApi;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
@@ -86,7 +85,7 @@ public class McBlockState {
      * @return True if the Entity can stand on this BlockState
      */
     public boolean entityCanStandOn(Entity bukkitEntity) {
-        net.minecraft.world.entity.Entity entity = EntityApi.getNMSEntity(bukkitEntity);
+        net.minecraft.world.entity.Entity entity = McUtils.getNMSEntity(bukkitEntity);
         Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(bukkitEntity.getLocation());
         return this.blockState.entityCanStandOn(levelPos.getFirst(), levelPos.getSecond(), entity);
     }

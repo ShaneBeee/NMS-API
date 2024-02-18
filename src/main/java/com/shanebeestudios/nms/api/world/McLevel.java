@@ -1,7 +1,6 @@
 package com.shanebeestudios.nms.api.world;
 
 import com.shanebeestudios.nms.api.util.McUtils;
-import com.shanebeestudios.nms.api.world.entity.EntityApi;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -59,7 +58,7 @@ public class McLevel {
      */
     public void destroyBlock(@NotNull Location location, boolean drop, @Nullable Entity breakingEntity) {
         BlockPos pos = McUtils.getPos(location);
-        net.minecraft.world.entity.Entity entity = breakingEntity != null ? EntityApi.getNMSEntity(breakingEntity) : null;
+        net.minecraft.world.entity.Entity entity = breakingEntity != null ? McUtils.getNMSEntity(breakingEntity) : null;
         this.level.destroyBlock(pos, drop, entity);
     }
 
