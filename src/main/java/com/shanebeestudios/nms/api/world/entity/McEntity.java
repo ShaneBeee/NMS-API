@@ -38,6 +38,15 @@ public class McEntity {
     }
 
     /**
+     * Get the Bukkit version of this Entity
+     *
+     * @return Bukkit Entity
+     */
+    public org.bukkit.entity.Entity getBukkitEntity() {
+        return this.entity.getBukkitEntity();
+    }
+
+    /**
      * Get the wrapped level of this entity
      *
      * @return Wrapped level of entity
