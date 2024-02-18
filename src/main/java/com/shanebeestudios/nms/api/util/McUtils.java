@@ -12,12 +12,15 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
@@ -190,6 +193,28 @@ public class McUtils {
     @NotNull
     public static ServerPlayer getServerPlayer(@NotNull Player player) {
         return ReflectionShortcuts.getNMSPlayer(player);
+    }
+
+    /**
+     * Get an NMS Entity from a {@link org.bukkit.entity.Entity Bukkit Entity}
+     *
+     * @param bukkitEntity Bukkit Entity
+     * @return NMS Entity
+     */
+    public static Entity getNMSEntity(org.bukkit.entity.Entity bukkitEntity) {
+        return ReflectionShortcuts.getNMSEntity(bukkitEntity);
+    }
+
+    /**
+     * Get the NMS EntityType from Bukkit EntityType
+     *
+     * @param bukkitType Bukkit EntityType to convert
+     * @return NMS EntityType from Bukkit
+     */
+    public static EntityType<?> getEntityType(org.bukkit.entity.EntityType bukkitType) {
+        NamespacedKey key = bukkitType.getKey();
+        ResourceLocation resourceLocation = McUtils.getResourceLocation(key);
+        return BuiltInRegistries.ENTITY_TYPE.get(resourceLocation);
     }
 
     /**

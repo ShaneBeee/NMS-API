@@ -27,8 +27,10 @@ import java.util.stream.Collectors;
 
 /**
  * Api methods pertaining to an {@link org.bukkit.entity.Entity}
+ * @deprecated Instead use {@link McEntity}, also some methods found in {@link McUtils}
  */
 @SuppressWarnings({"unused", "UnstableApiUsage"})
+@Deprecated
 public class EntityApi {
 
     private EntityApi() {
