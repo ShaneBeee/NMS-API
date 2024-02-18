@@ -326,25 +326,20 @@ public class McUtils {
     /**
      * Set the skin of a GameProfile
      *
-     * @param name        Name of player
      * @param gameProfile Profile to set
      */
     // Courtesy of Jonas2004
     // https://www.spigotmc.org/threads/create-fake-player-1-20-2.621480/#post-4649259
-    public static void setSkin(String name, GameProfile gameProfile) {
+    public static void setSkin(GameProfile gameProfile) {
         Gson gson = new Gson();
-        String url = "https://api.mojang.com/users/profiles/minecraft/" + name;
+        String url = "https://sessionserver.mojang.com/session/minecraft/profile/" + gameProfile.getId().toString() + "?unsigned=false";
         String json = getStringFromURL(url);
-        String uuid = gson.fromJson(json, JsonObject.class).get("id").getAsString();
-
-        url = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false";
-        json = getStringFromURL(url);
         JsonObject mainObject = gson.fromJson(json, JsonObject.class);
         JsonObject jsonObject = mainObject.get("properties").getAsJsonArray().get(0).getAsJsonObject();
         String value = jsonObject.get("value").getAsString();
         String signature = jsonObject.get("signature").getAsString();
         PropertyMap propertyMap = gameProfile.getProperties();
-        propertyMap.put("name", new Property("name", name));
+        propertyMap.put("name", new Property("name", gameProfile.getName()));
         propertyMap.put("textures", new Property("textures", value, signature));
     }
 
@@ -366,7 +361,9 @@ public class McUtils {
         return text.toString();
     }
 
-    /** Get the Minecraft Server
+    /**
+     * Get the Minecraft Server
+     *
      * @param server Bukkit Server to convert to Minecraft Server
      * @return Minecraft Server from Bukkit Server
      */

@@ -68,7 +68,7 @@ public class PlayerApi {
 
         OfflinePlayer op = Bukkit.getOfflinePlayer(name);
         GameProfile gameProfile = new GameProfile(op.getUniqueId(), name);
-        McUtils.setSkin(name, gameProfile);
+        McUtils.setSkin(gameProfile);
         ServerPlayer serverPlayer = new ServerPlayer(MINECRAFT_SERVER, level, gameProfile, ClientInformation.createDefault());
         serverPlayer.setPos(loc.getX(), loc.getY(), loc.getZ());
 
@@ -149,7 +149,7 @@ public class PlayerApi {
         CompletableFuture<GameProfile> skinFuture = CompletableFuture.supplyAsync(() -> {
             OfflinePlayer op = Bukkit.getOfflinePlayer(name);
             GameProfile gameProfile = new GameProfile(op.getUniqueId(), name);
-            McUtils.setSkin(name, gameProfile);
+            McUtils.setSkin(gameProfile);
             return gameProfile;
         });
 
