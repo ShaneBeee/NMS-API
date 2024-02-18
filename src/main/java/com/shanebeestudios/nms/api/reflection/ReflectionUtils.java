@@ -10,8 +10,7 @@ import java.lang.reflect.Field;
 @SuppressWarnings("unused")
 public class ReflectionUtils {
 
-    private static final String VERSION = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3] + ".";
-    private static final boolean NEW_NMS = isRunningMinecraft(1, 17);
+    private static final String CB_PACKAGE = Bukkit.getServer().getClass().getPackage().getName();
 
     /**
      * Get a class from the {@link org.bukkit.craftbukkit} package
@@ -20,9 +19,8 @@ public class ReflectionUtils {
      * @return Class object
      */
     public static Class<?> getOBCClass(String obcClassString) {
-        String name = "org.bukkit.craftbukkit." + VERSION + obcClassString;
         try {
-            return Class.forName(name);
+            return Class.forName(CB_PACKAGE + "." + obcClassString);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             return null;
@@ -38,11 +36,7 @@ public class ReflectionUtils {
      */
     public static Class<?> getNMSClass(String nmsClass, String nmsPackage) {
         try {
-            if (NEW_NMS) {
-                return Class.forName(nmsPackage + "." + nmsClass);
-            } else {
-                return Class.forName("net.minecraft.server." + VERSION + nmsClass);
-            }
+            return Class.forName(nmsPackage + "." + nmsClass);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             return null;
