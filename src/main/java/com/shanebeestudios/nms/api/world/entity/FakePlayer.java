@@ -197,6 +197,7 @@ public class FakePlayer {
      */
     public void remove() {
         PlayerApi.FAKE_PLAYERS.remove(this.fakeServerPlayer.getGameProfile().getName());
+        if (this.attachedEntity != null) this.attachedEntity.discard();
         MinecraftServer.getServer().getPlayerList().players.forEach(serverPlayer -> {
             ServerGamePacketListenerImpl connection = serverPlayer.connection;
             connection.send(new ClientboundRemoveEntitiesPacket(this.id));
@@ -215,7 +216,8 @@ public class FakePlayer {
 
     @Override
     public String toString() {
-        return "FakePlayer{name='" + this.fakeServerPlayer.getGameProfile().getName() + "'}";
+        String attach = this.attachedEntity != null ? (",attached=" + this.attachedEntity.getType().toShortString()) : "";
+        return "FakePlayer{name='" + this.fakeServerPlayer.getGameProfile().getName() + "'" + attach + "}";
     }
 
 }
