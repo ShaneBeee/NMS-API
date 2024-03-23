@@ -30,6 +30,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -43,11 +44,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -347,7 +349,6 @@ public class McUtils {
         };
     }
 
-
     /**
      * Set the skin of a GameProfile
      *
@@ -355,35 +356,25 @@ public class McUtils {
      */
     // Courtesy of Jonas2004
     // https://www.spigotmc.org/threads/create-fake-player-1-20-2.621480/#post-4649259
+    // (modified a bit)
     public static void setSkin(GameProfile gameProfile) {
-        Gson gson = new Gson();
-        String url = "https://sessionserver.mojang.com/session/minecraft/profile/" + gameProfile.getId().toString() + "?unsigned=false";
-        String json = getStringFromURL(url);
-        JsonObject mainObject = gson.fromJson(json, JsonObject.class);
-        JsonObject jsonObject = mainObject.get("properties").getAsJsonArray().get(0).getAsJsonObject();
-        String value = jsonObject.get("value").getAsString();
-        String signature = jsonObject.get("signature").getAsString();
-        PropertyMap propertyMap = gameProfile.getProperties();
-        propertyMap.put("name", new Property("name", gameProfile.getName()));
-        propertyMap.put("textures", new Property("textures", value, signature));
-    }
-
-    private static String getStringFromURL(String url) {
-        StringBuilder text = new StringBuilder();
         try {
-            Scanner scanner = new Scanner(new URL(url).openStream());
-            while (scanner.hasNext()) {
-                String line = scanner.nextLine();
-                while (line.startsWith(" ")) {
-                    line = line.substring(1);
-                }
-                text.append(line);
+            URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + gameProfile.getId().toString() + "?unsigned=false");
+            InputStreamReader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8);
+            JsonObject mainObject = new Gson().fromJson(reader, JsonObject.class);
+            if (mainObject == null) {
+                Bukkit.getLogger().warning("[NMS-API] Skin cannot be fetched!");
+                return;
             }
-            scanner.close();
-        } catch (IOException exception) {
-            exception.printStackTrace();
+            JsonObject properties = mainObject.get("properties").getAsJsonArray().get(0).getAsJsonObject();
+            String value = properties.get("value").getAsString();
+            String signature = properties.get("signature").getAsString();
+            PropertyMap propertyMap = gameProfile.getProperties();
+            propertyMap.put("name", new Property("name", gameProfile.getName()));
+            propertyMap.put("textures", new Property("textures", value, signature));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return text.toString();
     }
 
     /**
