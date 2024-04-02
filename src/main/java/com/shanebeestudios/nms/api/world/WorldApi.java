@@ -116,8 +116,8 @@ public class WorldApi {
             throw new IllegalArgumentException("Worlds for both locations do not match!");
         }
 
-        BlockPos blockPos = McUtils.quantize(McUtils.getPos(location));
-        BlockPos blockPos2 = McUtils.quantize(McUtils.getPos(location2));
+        BlockPos blockPos = McUtils.getPos(location);
+        BlockPos blockPos2 = McUtils.getPos(location2);
         BoundingBox box = BoundingBox.fromCorners(blockPos, blockPos2);
         ServerLevel level = McUtils.getServerLevel(world);
 

@@ -10,7 +10,6 @@ import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.core.QuartPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -304,26 +303,6 @@ public class McUtils {
     }
 
     /**
-     * Shift coordinates for 3D biomes
-     *
-     * @param coordinate Coordinate to shift
-     * @return Shifted coordinate
-     */
-    public static int quantize(int coordinate) {
-        return QuartPos.toBlock(QuartPos.fromBlock(coordinate));
-    }
-
-    /**
-     * Shift blockPos for 3D biomes
-     *
-     * @param pos BlockPos to shift
-     * @return Shifted BlockPos
-     */
-    public static BlockPos quantize(BlockPos pos) {
-        return new BlockPos(quantize(pos.getX()), quantize(pos.getY()), quantize(pos.getZ()));
-    }
-
-    /**
      * Make a resolver for 3D shifted biomes
      *
      * @param count       counter
@@ -336,11 +315,8 @@ public class McUtils {
     @NotNull
     public static BiomeResolver getBiomeResolver(MutableInt count, ChunkAccess chunkAccess, BoundingBox box, Holder<Biome> biome, Predicate<Holder<Biome>> filter) {
         return (x, y, z, noise) -> {
-            int i = QuartPos.toBlock(x);
-            int j = QuartPos.toBlock(y);
-            int k = QuartPos.toBlock(z);
             Holder<Biome> biomeHolder = chunkAccess.getNoiseBiome(x, y, z);
-            if (box.isInside(i, j, k) && filter.test(biomeHolder)) {
+            if (box.isInside(x << 2, y << 2, z << 2) && filter.test(biomeHolder)) {
                 count.increment();
                 return biome;
             } else {
