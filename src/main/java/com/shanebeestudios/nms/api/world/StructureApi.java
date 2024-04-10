@@ -46,7 +46,7 @@ public class StructureApi {
      * @param featureKey Key of feature to place
      * @param location   Location to place at
      * @return True if feature was placed, otherwise false if failed
-     * @see <a href="https://minecraft.fandom.com/wiki/Custom_feature?so=search#Configured_Feature">McWiki - Configured Feature</a>
+     * @see <a href="https://minecraft.wiki/w/Configured_feature">McWiki - Configured Feature</a>
      */
     public static boolean placeConfiguredFeature(@NotNull NamespacedKey featureKey, @NotNull Location location) {
         Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(location);
@@ -66,7 +66,7 @@ public class StructureApi {
      * @param featureKey Key of feature to place
      * @param location   Location to place at
      * @return True if feature was placed, otherwise false if failed
-     * @see <a href="https://minecraft.fandom.com/wiki/Custom_feature?so=search#Placed_feature">McWiki - Placed Feature</a>
+     * @see <a href="https://minecraft.wiki/w/Placed_feature">McWiki - Placed Feature</a>
      */
     public static boolean placePlacedFeature(@NotNull NamespacedKey featureKey, @NotNull Location location) {
         Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(location);
