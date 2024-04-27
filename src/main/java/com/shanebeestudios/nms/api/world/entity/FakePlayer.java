@@ -32,7 +32,7 @@ import java.util.List;
 public class FakePlayer {
 
     private final ServerPlayer fakeServerPlayer;
-    private final Entity attachedEntity;
+    private Entity attachedEntity;
     private final Entry fakePlayerEntry;
     private final int id;
     private McPlayer mcPlayer;
@@ -46,7 +46,7 @@ public class FakePlayer {
         if (attachedEntity != null) serverPlayer.setId(attachedEntity.getId());
         this.fakeServerPlayer = serverPlayer;
         this.fakePlayerEntry = new Entry(this.fakeServerPlayer.getUUID(), this.fakeServerPlayer.getGameProfile(), true, 0,
-                GameType.CREATIVE, this.fakeServerPlayer.getDisplayName(), null);
+            GameType.CREATIVE, this.fakeServerPlayer.getDisplayName(), null);
         this.id = serverPlayer.getId();
         this.attachedEntity = attachedEntity;
     }
@@ -102,6 +102,23 @@ public class FakePlayer {
         return null;
     }
 
+    public void attach(Entity entity) {
+        if (this.attachedEntity != null) this.attachedEntity.discard();
+        this.attachedEntity = entity;
+        this.fakeServerPlayer.absMoveTo(entity.getX(), entity.getY(), entity.getZ());
+
+        ClientboundRemoveEntitiesPacket removePacket = new ClientboundRemoveEntitiesPacket(
+            entity.getId(), this.fakeServerPlayer.getId());
+        MinecraftServer.getServer().getPlayerList().players.forEach(p -> p.connection.send(removePacket));
+        this.fakeServerPlayer.setId(entity.getId());
+        update();
+    }
+
+    public void attach(org.bukkit.entity.Entity bukkitEntity) {
+        Entity nmsEntity = McUtils.getNMSEntity(bukkitEntity);
+        attach(nmsEntity);
+    }
+
     /**
      * Teleport this player to another location
      * <p>Currently does not support changing worlds/levels.</p>
@@ -140,7 +157,7 @@ public class FakePlayer {
         byte pitch = (byte) Mth.floor(this.fakeServerPlayer.getXRot() * 256.0F / 360.0F);
 
         ClientboundMoveEntityPacket.PosRot positionPacket = new ClientboundMoveEntityPacket.PosRot(
-                this.id, x, y, z, yaw, pitch, true);
+            this.id, x, y, z, yaw, pitch, true);
         MinecraftServer.getServer().getPlayerList().players.forEach(p -> p.connection.send(positionPacket));
 
         byte headRot = (byte) Mth.floor(this.fakeServerPlayer.getYHeadRot() * 256.0F / 360.0F);
