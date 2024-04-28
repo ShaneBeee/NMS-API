@@ -38,7 +38,8 @@ build {
 
 // Run task to build jar to another spot
 tasks.register('server', Copy) {
-    from reobfJar
+    from jar // Mapped jar
+    //from reobfJar // Obfuscated jar
     // Change this to wherever you want your jar to build
     into '/Users/ShaneBee/Desktop/Server/Skript/' + serverLocation + '/plugins/skript-reflect/'
 }
