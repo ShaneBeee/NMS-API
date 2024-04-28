@@ -1,19 +1,19 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id("io.papermc.paperweight.userdev") version "1.5.11" // the latest version can be found on the Gradle Plugin Portal
+    id("io.papermc.paperweight.userdev") version "1.6.2" // the latest version can be found on the Gradle Plugin Portal
 }
 
 // The Minecraft version we're currently building for
-def minecraftVersion = '1.20.4'
+def minecraftVersion = '1.20.5'
 // Where this builds on the server
-def serverLocation = '1-20-4'
+def serverLocation = '1-20-5'
 // Version of NMS-API
 def projectVersion = '1.6.0'
 
 compileJava {
-    sourceCompatibility = '17'
-    targetCompatibility = '17'
+    sourceCompatibility = '21'
+    targetCompatibility = '21'
     options.encoding = 'UTF-8'
 }
 
