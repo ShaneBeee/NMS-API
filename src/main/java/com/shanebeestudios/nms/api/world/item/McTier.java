@@ -57,9 +57,11 @@ public class McTier {
      * Get the level of this tier
      *
      * @return Level of this tier
+     * @deprecated Minecraft removed the tier level
      */
+    @Deprecated(forRemoval = true, since = "April 27/2023")
     public int getLevel() {
-        return this.tier.getLevel();
+        throw new RuntimeException("no longer available");
     }
 
     /**

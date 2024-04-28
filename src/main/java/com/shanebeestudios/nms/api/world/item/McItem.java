@@ -1,10 +1,9 @@
 package com.shanebeestudios.nms.api.world.item;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.TieredItem;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,7 +56,7 @@ public class McItem {
      * @return whether this item is edible
      */
     public boolean isEdible() {
-        return this.item.isEdible();
+        return this.item.components().has(DataComponents.FOOD);
     }
 
     /**
@@ -66,7 +65,7 @@ public class McItem {
      * @return True if can always eat else false
      */
     public boolean canAlwaysEat() {
-        FoodProperties foodProperties = this.item.getFoodProperties();
+        FoodProperties foodProperties = this.item.components().get(DataComponents.FOOD);
         return foodProperties != null && foodProperties.canAlwaysEat();
     }
 
@@ -76,8 +75,8 @@ public class McItem {
      * @return Nutrition if food item else 0
      */
     public int getNutrition() {
-        FoodProperties foodProperties = this.item.getFoodProperties();
-        return foodProperties != null ? foodProperties.getNutrition() : 0;
+        FoodProperties foodProperties = this.item.components().get(DataComponents.FOOD);
+        return foodProperties != null ? foodProperties.nutrition() : 0;
     }
 
     /**
@@ -86,28 +85,32 @@ public class McItem {
      * @return Saturation modifier if food item else 0
      */
     public float getSaturationModifier() {
-        FoodProperties foodProperties = this.item.getFoodProperties();
-        return foodProperties != null ? foodProperties.getSaturationModifier() : 0;
+        FoodProperties foodProperties = this.item.components().get(DataComponents.FOOD);
+        return foodProperties != null ? foodProperties.saturation() : 0;
     }
 
     /**
      * Check if this item is a meat product
      *
      * @return True if meat product else false
+     * @deprecated No longer used in Minecraft
      */
+    @Deprecated(forRemoval = true, since = "April 27/2024")
     public boolean isMeat() {
-        FoodProperties foodProperties = this.item.getFoodProperties();
-        return foodProperties != null && foodProperties.isMeat();
+        return false;
     }
 
     /**
      * Check if this item can be instantly eaten
      *
      * @return True if can instantly eat else false
+     * @deprecated No longer used in Minecraft
      */
+    @Deprecated(forRemoval = true, since = "April 27/2024")
     public boolean isFastFood() {
-        FoodProperties foodProperties = this.item.getFoodProperties();
-        return foodProperties != null && foodProperties.isFastFood();
+        FoodProperties foodProperties = this.item.components().get(DataComponents.FOOD);
+        if (foodProperties == null) return false;
+        return foodProperties.eatSeconds() <= 0.8f;
     }
 
     /**
@@ -116,7 +119,7 @@ public class McItem {
      * @return True if fire-resistant else false
      */
     public boolean isFireResistant() {
-        return this.item.isFireResistant();
+        return this.item.components().has(DataComponents.FIRE_RESISTANT);
     }
 
     /**
@@ -133,10 +136,10 @@ public class McItem {
      * <p>Only works on Sword and Digger (axe, hoe, pickaxe, shovel) items</p>
      *
      * @return Damage amount if applicable else 0
+     * @deprecated No longer used
      */
+    @Deprecated(forRemoval = true, since = "April 27/2024")
     public float getDamage() {
-        if (this.item instanceof SwordItem swordItem) return swordItem.getDamage();
-        if (this.item instanceof DiggerItem diggerItem) return diggerItem.getAttackDamage();
         return 0;
     }
 
@@ -148,8 +151,10 @@ public class McItem {
      * @param itemStack ItemStack to check against (enchantments matter) (can be null)
      * @return Rarity of item
      */
+    @Nullable
     public Rarity getRarity(@Nullable ItemStack itemStack) {
-        net.minecraft.world.item.Rarity rarity = itemStack != null ? this.item.getRarity(itemStack) : this.item.rarity;
+        net.minecraft.world.item.Rarity rarity = this.item.components().get(DataComponents.RARITY);
+        if (rarity == null) return null;
         return switch (rarity) {
             case COMMON -> Rarity.COMMON;
             case UNCOMMON -> Rarity.UNCOMMON;

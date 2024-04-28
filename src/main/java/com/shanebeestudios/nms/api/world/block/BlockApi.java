@@ -146,13 +146,15 @@ public class BlockApi {
      */
     @Deprecated(forRemoval = true,since = "Dec 9/2023")
     public static void randomlyTick(Block bukkitBlock) {
-        BlockState blockState = McUtils.getBlockStateFromBlock(bukkitBlock);
-        net.minecraft.world.level.block.Block block = blockState.getBlock();
-
-        Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(bukkitBlock.getLocation());
-        ServerLevel level = levelPos.getFirst();
-
-        block.randomTick(blockState, level, levelPos.getSecond(), level.getRandom());
+//        BlockState blockState = McUtils.getBlockStateFromBlock(bukkitBlock);
+//        net.minecraft.world.level.block.Block block = blockState.getBlock();
+//
+//        Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(bukkitBlock.getLocation());
+//        ServerLevel level = levelPos.getFirst();
+//
+//        block.randomTick(blockState, level, levelPos.getSecond(), level.getRandom());
+        // Minecraft blocked this in 1.20.5
+        bukkitBlock.randomTick();
     }
 
     /**

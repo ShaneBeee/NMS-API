@@ -122,8 +122,10 @@ public class McBlock {
      */
     @Deprecated(forRemoval = true,since = "Dec 9/2023")
     public boolean isRandomlyTicking(org.bukkit.block.Block bukkitBlock) {
-        BlockState blockState = McUtils.getBlockStateFromBlock(bukkitBlock);
-        return this.block.isRandomlyTicking(blockState);
+//        BlockState blockState = McUtils.getBlockStateFromBlock(bukkitBlock);
+//        return this.block.isRandomlyTicking(blockState);
+        // Minecraft blocked this
+        throw new RuntimeException("No longer available!");
     }
 
 }

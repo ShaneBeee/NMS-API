@@ -152,7 +152,8 @@ public class McItemStack {
     public List<Component> getTooltipLines(Player player, boolean advanced) {
         List<Component> lines = new ArrayList<>();
         ServerPlayer serverPlayer = player != null ? McUtils.getServerPlayer(player) : null;
-        List<net.minecraft.network.chat.Component> tooltipLines = this.itemStack.getTooltipLines(serverPlayer, advanced ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
+        Item.TooltipContext context = serverPlayer != null ? Item.TooltipContext.of(serverPlayer.level()) : Item.TooltipContext.EMPTY;
+        List<net.minecraft.network.chat.Component> tooltipLines = this.itemStack.getTooltipLines(context, serverPlayer, advanced ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
         for (net.minecraft.network.chat.Component tooltipLine : tooltipLines) {
             Component adventure = PaperAdventure.asAdventure(tooltipLine);
             lines.add(adventure);

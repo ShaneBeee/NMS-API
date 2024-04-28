@@ -44,6 +44,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -335,7 +337,7 @@ public class McUtils {
     // (modified a bit)
     public static void setSkin(GameProfile gameProfile) {
         try {
-            URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + gameProfile.getId().toString() + "?unsigned=false");
+            URL url = new URI("https://sessionserver.mojang.com/session/minecraft/profile/" + gameProfile.getId().toString() + "?unsigned=false").toURL();
             InputStreamReader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8);
             JsonObject mainObject = new Gson().fromJson(reader, JsonObject.class);
             if (mainObject == null) {
@@ -348,7 +350,7 @@ public class McUtils {
             PropertyMap propertyMap = gameProfile.getProperties();
             propertyMap.put("name", new Property("name", gameProfile.getName()));
             propertyMap.put("textures", new Property("textures", value, signature));
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
