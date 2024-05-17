@@ -5,6 +5,8 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TieredItem;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.FoodComponent;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -54,7 +56,9 @@ public class McItem {
      * Check if this item is edible
      *
      * @return whether this item is edible
+     * @deprecated Can be done in Bukkit now {@link ItemMeta#hasFood()}
      */
+    @Deprecated(forRemoval = true, since = "May 16/2024")
     public boolean isEdible() {
         return this.item.components().has(DataComponents.FOOD);
     }
@@ -63,7 +67,9 @@ public class McItem {
      * Check if this item can always be eaten
      *
      * @return True if can always eat else false
+     * @deprecated Can be done in Bukkit now {@link FoodComponent#canAlwaysEat()}
      */
+    @Deprecated(forRemoval = true, since = "May 16/2024")
     public boolean canAlwaysEat() {
         FoodProperties foodProperties = this.item.components().get(DataComponents.FOOD);
         return foodProperties != null && foodProperties.canAlwaysEat();
@@ -73,7 +79,9 @@ public class McItem {
      * Get the nutrition if this is a food item
      *
      * @return Nutrition if food item else 0
+     * @deprecated Can be done in Bukkit now, {@link FoodComponent#getNutrition()}
      */
+    @Deprecated(forRemoval = true, since = "May 16/2024")
     public int getNutrition() {
         FoodProperties foodProperties = this.item.components().get(DataComponents.FOOD);
         return foodProperties != null ? foodProperties.nutrition() : 0;
@@ -83,7 +91,9 @@ public class McItem {
      * Get the saturation modifier if this is a food item
      *
      * @return Saturation modifier if food item else 0
+     * @deprecated Can be done in Bukkit now, {@link FoodComponent#getSaturation()}
      */
+    @Deprecated(forRemoval = true, since = "May 16/2024")
     public float getSaturationModifier() {
         FoodProperties foodProperties = this.item.components().get(DataComponents.FOOD);
         return foodProperties != null ? foodProperties.saturation() : 0;
@@ -150,8 +160,10 @@ public class McItem {
      *
      * @param itemStack ItemStack to check against (enchantments matter) (can be null)
      * @return Rarity of item
+     * @deprecated Can be done in Bukkit now {@link ItemMeta#getRarity()}
      */
     @Nullable
+    @Deprecated(forRemoval = true, since = "May 16/2024")
     public Rarity getRarity(@Nullable ItemStack itemStack) {
         net.minecraft.world.item.Rarity rarity = this.item.components().get(DataComponents.RARITY);
         if (rarity == null) return null;
