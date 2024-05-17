@@ -55,6 +55,7 @@ public class PlayerApi {
      * <p>This will cache the fake player as well for later retrieval</p>
      * <p>NOTE: The attached entity will spawn, and the player will take over its AI,
      * This may cause some client lag depending on the chosen entity.</p>
+     * <p>Will automatically update to all players</p>
      *
      * @param name       Name of fake player
      * @param loc        Location of fake player
@@ -62,6 +63,23 @@ public class PlayerApi {
      * @return FakePlayer instance
      */
     public static FakePlayer spawnFakePlayer(@NotNull String name, @NotNull Location loc, @Nullable EntityType attachType) {
+        return spawnFakePlayer(name, loc, attachType, true);
+    }
+
+    /**
+     * Spawn a {@link FakePlayer}
+     * <p>This will cache the fake player as well for later retrieval</p>
+     * <p>NOTE: The attached entity will spawn, and the player will take over its AI,
+     * This may cause some client lag depending on the chosen entity.</p>
+     * <p>If not using update, use {@link FakePlayer#update()} or {@link FakePlayer#update(Player)} to update to players.</p>
+     *
+     * @param name       Name of fake player
+     * @param loc        Location of fake player
+     * @param attachType Type of entity to spawn and attach the player to
+     * @param update     Whether to update the fake player to all online players
+     * @return FakePlayer instance
+     */
+    public static FakePlayer spawnFakePlayer(@NotNull String name, @NotNull Location loc, @Nullable EntityType attachType, boolean update) {
         // create player entity
         World world = loc.getWorld() != null ? loc.getWorld() : Bukkit.getWorlds().get(0);
         ServerLevel level = McUtils.getServerLevel(world);
@@ -92,7 +110,7 @@ public class PlayerApi {
         // Create fake player and update to all clients
         FakePlayer fakePlayer = new FakePlayer(serverPlayer, attachedEntity);
         FAKE_PLAYERS.put(name, fakePlayer);
-        fakePlayer.update();
+        if (update) fakePlayer.update();
         return fakePlayer;
     }
 
@@ -113,6 +131,7 @@ public class PlayerApi {
      * <p>This will cache the fake player as well for later retrieval</p>
      * <p>NOTE: The attached entity will spawn, and the player will take over its AI,
      * This may cause some client lag depending on the chosen entity.</p>
+     * <p>Will automatically update to all players.</p>
      *
      * @param name       Name of fake player
      * @param loc        Location of fake player
@@ -120,6 +139,23 @@ public class PlayerApi {
      * @return FakePlayer instance
      */
     public static CompletableFuture<FakePlayer> spawnFakePlayerAsync(@NotNull String name, @NotNull Location loc, @Nullable EntityType attachType) {
+        return spawnFakePlayerAsync(name, loc, attachType, true);
+    }
+
+    /**
+     * Spawn a {@link FakePlayer} async
+     * <p>This will cache the fake player as well for later retrieval</p>
+     * <p>NOTE: The attached entity will spawn, and the player will take over its AI,
+     * This may cause some client lag depending on the chosen entity.</p>
+     * <p>If not using update, use {@link FakePlayer#update()} or {@link FakePlayer#update(Player)} to update to players.</p>
+     *
+     * @param name       Name of fake player
+     * @param loc        Location of fake player
+     * @param attachType Type of entity to spawn and attach the player to
+     * @param update     Whether to update the fake player to all online players
+     * @return FakePlayer instance
+     */
+    public static CompletableFuture<FakePlayer> spawnFakePlayerAsync(@NotNull String name, @NotNull Location loc, @Nullable EntityType attachType, boolean update) {
         // create fake player
         World world = loc.getWorld() != null ? loc.getWorld() : Bukkit.getWorlds().get(0);
         ServerLevel level = McUtils.getServerLevel(world);
