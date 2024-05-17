@@ -196,7 +196,7 @@ public class PlayerApi {
 
             FakePlayer fakePlayer = new FakePlayer(serverPlayer, attachedEntity);
             FAKE_PLAYERS.put(name, fakePlayer);
-            fakePlayer.update();
+            if (update) fakePlayer.update();
             fakePlayerFuture.complete(fakePlayer);
             return fakePlayer;
         });
