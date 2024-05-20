@@ -6,6 +6,7 @@ import net.minecraft.server.dedicated.DedicatedPlayerList;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.DedicatedServerProperties;
 import net.minecraft.server.level.ServerLevel;
+import org.bukkit.Bukkit;
 import org.bukkit.Server;
 
 import java.util.List;
@@ -25,6 +26,15 @@ public class McServer {
      */
     public static McServer wrap(Server bukkitServer) {
         return new McServer(McUtils.getMinecraftServer(bukkitServer));
+    }
+
+    /**
+     * Wrap the Bukkit server as MinecraftServer
+     *
+     * @return Wrapped MinecraftServer
+     */
+    public static McServer wrap() {
+        return new McServer(McUtils.getMinecraftServer(Bukkit.getServer()));
     }
 
     private final DedicatedServer server;
