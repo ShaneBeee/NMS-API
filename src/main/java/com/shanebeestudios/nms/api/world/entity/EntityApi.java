@@ -1,10 +1,8 @@
 package com.shanebeestudios.nms.api.world.entity;
 
-import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import com.shanebeestudios.nms.api.util.McUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -16,6 +14,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +26,7 @@ import java.util.stream.Collectors;
 
 /**
  * Api methods pertaining to an {@link org.bukkit.entity.Entity}
+ *
  * @deprecated Instead use {@link McEntity}, also some methods found in {@link McUtils}
  */
 @SuppressWarnings({"unused", "UnstableApiUsage"})
@@ -43,7 +43,7 @@ public class EntityApi {
      * @return NMS Entity
      */
     public static Entity getNMSEntity(org.bukkit.entity.Entity bukkitEntity) {
-        return ReflectionShortcuts.getNMSEntity(bukkitEntity);
+        return ((CraftEntity) bukkitEntity).getHandle();
     }
 
     /**
@@ -53,9 +53,7 @@ public class EntityApi {
      * @return NMS EntityType from Bukkit
      */
     public static EntityType<?> getEntityType(org.bukkit.entity.EntityType bukkitType) {
-        NamespacedKey key = bukkitType.getKey();
-        ResourceLocation resourceLocation = McUtils.getResourceLocation(key);
-        return BuiltInRegistries.ENTITY_TYPE.get(resourceLocation);
+        return McUtils.getEntityType(bukkitType);
     }
 
     /**
@@ -116,7 +114,7 @@ public class EntityApi {
 
     private static void damage(@NotNull org.bukkit.entity.Entity victim, float damage, @Nullable NamespacedKey damageKey, @Nullable org.bukkit.entity.Entity directEntity, @Nullable org.bukkit.entity.Entity causingEntity, @Nullable Vector vec) {
         Entity nmsEntity = getNMSEntity(victim);
-        ServerLevel serverLevel = ReflectionShortcuts.getServerLevel(victim.getWorld());
+        ServerLevel serverLevel = McUtils.getServerLevel(victim.getWorld());
         if (damageKey == null) damageKey = NamespacedKey.minecraft("generic");
 
         Registry<DamageType> damageTypes = serverLevel.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);

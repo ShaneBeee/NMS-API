@@ -1,11 +1,11 @@
 package com.shanebeestudios.nms.api.world.entity;
 
 import com.mojang.authlib.GameProfile;
-import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import com.shanebeestudios.nms.api.util.McUtils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import org.bukkit.craftbukkit.entity.CraftEntity;
 
 /**
  * Wrapper for Minecraft Player
@@ -75,7 +75,7 @@ public class McPlayer extends McEntity {
      * @param bukkitEntity Entity to touch
      */
     public void touch(org.bukkit.entity.Entity bukkitEntity) {
-        Entity nmsEntity = ReflectionShortcuts.getNMSEntity(bukkitEntity);
+        Entity nmsEntity = ((CraftEntity) bukkitEntity).getHandle();
         nmsEntity.playerTouch(this.player);
     }
 

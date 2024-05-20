@@ -6,7 +6,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
-import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -26,10 +25,12 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -38,6 +39,13 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.craftbukkit.CraftChunk;
+import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.CraftBlock;
+import org.bukkit.craftbukkit.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -162,7 +170,7 @@ public class McUtils {
      */
     @NotNull
     public static ServerLevel getServerLevel(@NotNull World world) {
-        return ReflectionShortcuts.getServerLevel(world);
+        return ((CraftWorld) world).getHandle();
     }
 
     /**
@@ -170,10 +178,17 @@ public class McUtils {
      *
      * @param world Bukkit world to get WorldGenLevel from
      * @return WorldGenLevel from Bukkit world
+     * @deprecated Unused, use {@link #getServerLevel(World)} instead
      */
     @NotNull
+    @Deprecated
     public static WorldGenLevel getWorldGenLevel(@NotNull World world) {
-        return ReflectionShortcuts.getWorldGenLevel(world);
+        return getServerLevel(world);
+    }
+
+    public static LevelChunk getLevelChunk(Chunk chunk) {
+        ServerLevel serverLevel = getServerLevel(chunk.getWorld());
+        return serverLevel.getChunk(chunk.getX(), chunk.getZ());
     }
 
     /**
@@ -195,7 +210,7 @@ public class McUtils {
      */
     @NotNull
     public static ServerPlayer getServerPlayer(@NotNull Player player) {
-        return ReflectionShortcuts.getNMSPlayer(player);
+        return ((CraftPlayer) player).getHandle();
     }
 
     /**
@@ -205,7 +220,7 @@ public class McUtils {
      * @return NMS Entity
      */
     public static Entity getNMSEntity(org.bukkit.entity.Entity bukkitEntity) {
-        return ReflectionShortcuts.getNMSEntity(bukkitEntity);
+        return ((CraftEntity) bukkitEntity).getHandle();
     }
 
     /**
@@ -228,7 +243,7 @@ public class McUtils {
      */
     @NotNull
     public static BlockData getBlockDataFromState(BlockState blockState) {
-        BlockData blockDataFromBlockState = ReflectionShortcuts.getBlockDataFromBlockState(blockState);
+        BlockData blockDataFromBlockState = CraftBlockData.fromData(blockState);
         return blockDataFromBlockState != null ? blockDataFromBlockState : AIR;
     }
 
@@ -240,7 +255,7 @@ public class McUtils {
      */
     @NotNull
     public static BlockState getBlockStateFromBlock(Block bukkitBlock) {
-        return ReflectionShortcuts.getBlockStateFromBlock(bukkitBlock);
+        return ((CraftBlock) bukkitBlock).getNMS();
     }
 
     /**
@@ -251,7 +266,7 @@ public class McUtils {
      */
     @NotNull
     public static BlockState getBlockStateFromData(BlockData blockData) {
-        return ReflectionShortcuts.getBlockStateFromData(blockData);
+        return ((CraftBlockData) blockData).getState();
     }
 
     /**
@@ -362,7 +377,7 @@ public class McUtils {
      * @return Minecraft Server from Bukkit Server
      */
     public static DedicatedServer getMinecraftServer(Server server) {
-        return ReflectionShortcuts.getMinecraftServer(server);
+        return ((CraftServer) server).getServer();
     }
 
 }

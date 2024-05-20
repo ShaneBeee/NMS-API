@@ -1,6 +1,5 @@
 package com.shanebeestudios.nms.api.world.item;
 
-import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import com.shanebeestudios.nms.api.util.McUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -10,6 +9,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TieredItem;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +38,7 @@ public class ItemApi {
      */
     @NotNull
     public static ItemStack getNMSItemStackCopy(@NotNull org.bukkit.inventory.ItemStack bukkitItemStack) {
-        return ReflectionShortcuts.getNMSItemStackCopy(bukkitItemStack);
+        return CraftItemStack.asNMSCopy(bukkitItemStack);
     }
 
     /**
@@ -48,7 +49,7 @@ public class ItemApi {
      */
     @NotNull
     public static ItemStack getNMSItemStack(@NotNull org.bukkit.inventory.ItemStack bukkitItemStack) {
-        return ReflectionShortcuts.getNMSItemStack(bukkitItemStack);
+        return ((CraftItemStack) bukkitItemStack).handle;
     }
 
     /**
@@ -84,7 +85,7 @@ public class ItemApi {
      */
     @NotNull
     public static Item getItem(@NotNull Material bukkitMaterial) {
-        return ReflectionShortcuts.getItemFromMaterial(bukkitMaterial);
+        return CraftMagicNumbers.getItem(bukkitMaterial);
     }
 
     /**

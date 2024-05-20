@@ -1,7 +1,6 @@
 package com.shanebeestudios.nms.api.world.entity;
 
 import com.mojang.authlib.GameProfile;
-import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import com.shanebeestudios.nms.api.util.McUtils;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
@@ -100,7 +99,7 @@ public class PlayerApi {
             }
             // Spawn entity used for attachment
             org.bukkit.entity.Entity spawn = loc.getWorld().spawn(loc, entityClass);
-            attachedEntity = ReflectionShortcuts.getNMSEntity(spawn);
+            attachedEntity = McUtils.getNMSEntity(spawn);
 
             // Visual remove that entity from the client
             ClientboundRemoveEntitiesPacket removePacket = new ClientboundRemoveEntitiesPacket(attachedEntity.getId());
@@ -171,7 +170,7 @@ public class PlayerApi {
             }
 
             org.bukkit.entity.Entity spawnedEntity = loc.getWorld().spawn(loc, entityClass);
-            attachedEntity = ReflectionShortcuts.getNMSEntity(spawnedEntity);
+            attachedEntity = McUtils.getNMSEntity(spawnedEntity);
 
             // Visually remove that entity from the client
             ClientboundRemoveEntitiesPacket removePacket = new ClientboundRemoveEntitiesPacket(attachedEntity.getId());
@@ -233,7 +232,7 @@ public class PlayerApi {
      * @return Connection from Player
      */
     public static @NotNull ServerGamePacketListenerImpl getPlayerConnection(@NotNull Player player) {
-        ServerPlayer serverPlayer = ReflectionShortcuts.getNMSPlayer(player);
+        ServerPlayer serverPlayer = McUtils.getServerPlayer(player);
         return serverPlayer.connection;
     }
 

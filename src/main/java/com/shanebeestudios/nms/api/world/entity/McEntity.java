@@ -1,8 +1,8 @@
 package com.shanebeestudios.nms.api.world.entity;
 
-import com.shanebeestudios.nms.api.reflection.ReflectionShortcuts;
 import com.shanebeestudios.nms.api.world.McLevel;
 import net.minecraft.world.entity.Entity;
+import org.bukkit.craftbukkit.entity.CraftEntity;
 
 /**
  * Wrapper for Minecraft Entity
@@ -27,8 +27,7 @@ public class McEntity {
      * @return Wrapped Entity
      */
     public static McEntity wrap(org.bukkit.entity.Entity bukkitEntity) {
-        Entity nmsEntity = ReflectionShortcuts.getNMSEntity(bukkitEntity);
-        return wrap(nmsEntity);
+        return wrap(((CraftEntity) bukkitEntity).getHandle());
     }
 
     private final Entity entity;
