@@ -136,28 +136,6 @@ public class BlockApi {
     }
 
     /**
-     * Randomly tick a block.
-     * <p>This does the same thing Minecraft does when it picks blocks to randomly tick,
-     * for example crops, leaf decay and farmland moisture.</p>
-     * <p>NOTE: If the block does not have any ticking code (ex: stone), nothing will happen.</p>
-     *
-     * @param bukkitBlock Block to randomly tick
-     * @deprecated see Paper's new method {@link Block#randomTick()}
-     */
-    @Deprecated(forRemoval = true,since = "Dec 9/2023")
-    public static void randomlyTick(Block bukkitBlock) {
-//        BlockState blockState = McUtils.getBlockStateFromBlock(bukkitBlock);
-//        net.minecraft.world.level.block.Block block = blockState.getBlock();
-//
-//        Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(bukkitBlock.getLocation());
-//        ServerLevel level = levelPos.getFirst();
-//
-//        block.randomTick(blockState, level, levelPos.getSecond(), level.getRandom());
-        // Minecraft blocked this in 1.20.5
-        bukkitBlock.randomTick();
-    }
-
-    /**
      * Get the destroy progress of a specific Block by a Player
      *
      * @param player      Player to check for progress
