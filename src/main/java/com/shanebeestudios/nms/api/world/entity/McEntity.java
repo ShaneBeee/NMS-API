@@ -63,4 +63,13 @@ public class McEntity {
         return this.entity.getId();
     }
 
+    /**
+     * Get the gravity of this entity
+     *
+     * @return Gravity of entity
+     */
+    public double getGravity() {
+        return this.entity.getGravity();
+    }
+
 }
