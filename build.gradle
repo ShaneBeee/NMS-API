@@ -6,6 +6,8 @@ plugins {
 
 // The Minecraft version we're currently building for
 def minecraftVersion = '1.20.6'
+// The Paper JavaDoc version to use
+def javaDocVersion = '1.20.6'
 // Where this builds on the server
 def serverLocation = '1-20-6'
 // Version of NMS-API
@@ -57,8 +59,7 @@ publishing {
 javadoc {
     destinationDir = file("${buildDir}/javadoc")
     options {
-        def javadocVer = Arrays.copyOfRange(minecraftVersion.split("\\."), 0, 2).join(".")
-        links("https://jd.papermc.io/paper/" + javadocVer)
+        links("https://jd.papermc.io/paper/" + javaDocVersion)
         title("NMS-API - ${projectVersion}")
     }
     exclude('com/shanebeestudios/nms/api/reflection')
