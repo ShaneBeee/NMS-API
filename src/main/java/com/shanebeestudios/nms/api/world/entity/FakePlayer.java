@@ -102,6 +102,12 @@ public class FakePlayer {
         return null;
     }
 
+    /**
+     * Attach an entity to a fake player
+     * <p>This will visually look like the player is doing what the entity would be doing</p>
+     *
+     * @param entity Entity to attach
+     */
     public void attach(Entity entity) {
         if (this.attachedEntity != null) this.attachedEntity.discard();
         this.attachedEntity = entity;
@@ -114,6 +120,12 @@ public class FakePlayer {
         update();
     }
 
+    /**
+     * Attach an entity to a fake player
+     * <p>This will visually look like the player is doing what the entity would be doing</p>
+     *
+     * @param bukkitEntity Entity to attach
+     */
     public void attach(org.bukkit.entity.Entity bukkitEntity) {
         Entity nmsEntity = McUtils.getNMSEntity(bukkitEntity);
         attach(nmsEntity);

@@ -6,7 +6,12 @@ package com.shanebeestudios.nms.api.util;
 @SuppressWarnings("unused")
 public class MathUtils {
 
-    /** Clamp a float between a min and a max
+    private MathUtils() {
+    }
+
+    /**
+     * Clamp a float between a min and a max
+     *
      * @param num Float to clamp
      * @param min Min value
      * @param max Max value
@@ -16,7 +21,9 @@ public class MathUtils {
         return Math.min(max, Math.max(num, min));
     }
 
-    /** Clamp an int between a min and a max
+    /**
+     * Clamp an int between a min and a max
+     *
      * @param num Int to clamp
      * @param min Min value
      * @param max Max value

@@ -180,19 +180,19 @@ public class McItem {
      */
     public enum Rarity {
         /**
-         *
+         * Common
          */
         COMMON,
         /**
-         *
+         * Uncommon
          */
         UNCOMMON,
         /**
-         *
+         * Rare
          */
         RARE,
         /**
-         *
+         * Epic
          */
         EPIC
     }

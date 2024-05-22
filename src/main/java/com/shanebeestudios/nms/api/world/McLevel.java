@@ -45,6 +45,11 @@ public class McLevel {
         this.level = level;
     }
 
+    /**
+     * Get level of rain in a Level
+     *
+     * @return Level of rain
+     */
     public float getRainLevel() {
         return this.level.rainLevel;
     }

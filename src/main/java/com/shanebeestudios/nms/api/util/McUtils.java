@@ -39,7 +39,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.CraftChunk;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
@@ -67,6 +66,9 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 public class McUtils {
+
+    private McUtils() {
+    }
 
     private static final BlockData AIR = Material.AIR.createBlockData();
 
@@ -186,6 +188,12 @@ public class McUtils {
         return getServerLevel(world);
     }
 
+    /**
+     * Get an instance of a LevelChunk from a {@link Chunk BukkitChunk}
+     *
+     * @param chunk Bukkit Chunk to convert
+     * @return LevelChunk from Chunk
+     */
     public static LevelChunk getLevelChunk(Chunk chunk) {
         ServerLevel serverLevel = getServerLevel(chunk.getWorld());
         return serverLevel.getChunk(chunk.getX(), chunk.getZ());
