@@ -49,7 +49,8 @@ public class ItemApi {
      */
     @NotNull
     public static ItemStack getNMSItemStack(@NotNull org.bukkit.inventory.ItemStack bukkitItemStack) {
-        return ((CraftItemStack) bukkitItemStack).handle;
+        if (bukkitItemStack instanceof CraftItemStack craftItemStack) return craftItemStack.handle;
+        return getNMSItemStackCopy(bukkitItemStack);
     }
 
     /**
