@@ -64,8 +64,9 @@ public class McPlayer extends McEntity {
      *
      * @param time Ticks to riptide
      */
+    @SuppressWarnings("DataFlowIssue")
     public void riptide(int time) {
-        this.player.startAutoSpinAttack(time);
+        this.player.startAutoSpinAttack(time, 0, null);
     }
 
     /**

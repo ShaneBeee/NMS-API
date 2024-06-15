@@ -181,7 +181,8 @@ public class FakePlayer {
         ServerGamePacketListenerImpl connection = serverPlayer.connection;
         connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER), this.fakePlayerEntry));
         connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED), this.fakePlayerEntry));
-        connection.send(this.fakeServerPlayer.getAddEntityPacket());
+        assert serverPlayer.tracker != null;
+        connection.send(this.fakeServerPlayer.getAddEntityPacket(serverPlayer.tracker.serverEntity));
     }
 
     /**

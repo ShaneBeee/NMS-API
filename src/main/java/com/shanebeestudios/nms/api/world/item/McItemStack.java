@@ -4,9 +4,11 @@ import com.shanebeestudios.nms.api.util.McUtils;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.block.Block;
@@ -76,6 +78,8 @@ public class McItemStack {
      * @return Wrapped Item
      */
     public McItem getItemWrapper() {
+        Rarity rarity = this.itemStack.getComponents().get(DataComponents.RARITY);
+
         return McItem.wrap(this.itemStack.getItem());
     }
 

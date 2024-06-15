@@ -63,7 +63,7 @@ public class WorldApi {
         ResourceLocation key = BIOME_REGISTRY.getKey(biome);
         if (key == null) {
             // This shouldn't happen, but safety feature
-            key = new ResourceLocation("minecraft", "plains");
+            key = ResourceLocation.fromNamespaceAndPath("minecraft", "plains");
         }
         return McUtils.getNamespacedKey(key);
     }

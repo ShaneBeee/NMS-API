@@ -150,7 +150,7 @@ public class McUtils {
      */
     @NotNull
     public static ResourceLocation getResourceLocation(NamespacedKey bukkitKey) {
-        return new ResourceLocation(bukkitKey.getNamespace(), bukkitKey.getKey());
+        return ResourceLocation.fromNamespaceAndPath(bukkitKey.getNamespace(), bukkitKey.getKey());
     }
 
     /**
