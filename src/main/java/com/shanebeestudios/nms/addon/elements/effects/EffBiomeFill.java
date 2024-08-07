@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Name("Biome Fill")
 @Description({"Fill a biome within 2 locations. Optionally only replace a specific biome.",
+    "Supports keys for custom biomes.",
     "This will also refresh biomes to players."})
 @Examples({"fill biome within {_loc1} and {_loc2} with mc key from \"terralith:moonlit_valley\"",
     "fill biome within {_loc1} and {_loc2} with mc key from \"terralith:moonlit_valley\" to replace plains"})
