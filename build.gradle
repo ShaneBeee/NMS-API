@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id 'java'
     id 'maven-publish'
@@ -21,10 +23,18 @@ compileJava {
 
 repositories {
     mavenCentral()
+
+    // Skript
+    maven { url 'https://repo.skriptlang.org/releases' }
 }
 
 dependencies {
     paperweight.paperDevBundle("${minecraftVersion}-R0.1-SNAPSHOT")
+
+    // Skript
+    compileOnly(group: 'com.github.SkriptLang', name: 'Skript', version: '2.8.7') {
+        transitive = false
+    }
 }
 
 build {
@@ -38,12 +48,16 @@ build {
     }
 }
 
+processResources {
+    filter ReplaceTokens, tokens: ["version": projectVersion]
+}
+
 // Run task to build jar to another spot
 tasks.register('server', Copy) {
     from jar // Mapped jar
     //from reobfJar // Obfuscated jar
     // Change this to wherever you want your jar to build
-    into '/Users/ShaneBee/Desktop/Server/Skript/' + serverLocation + '/plugins/skript-reflect/'
+    into '/Users/ShaneBee/Desktop/Server/Skript/' + serverLocation + '/plugins/'
 }
 
 publishing {
