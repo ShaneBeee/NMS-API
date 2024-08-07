@@ -2,24 +2,38 @@ package com.shanebeestudios.nms.addon;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
+import com.shanebeestudios.nms.addon.utils.Utils;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 
+@SuppressWarnings("unused")
 public class SkNMS extends JavaPlugin {
 
-    private static SkNMS instance;
+    private static SkNMS PLUGIN_INSTANCE;
 
     @Override
     public void onEnable() {
-        instance = this;
-        if (Skript.isAcceptRegistrations()) {
-            SkriptAddon skriptAddon = Skript.registerAddon(this);
-            try {
-                skriptAddon.loadClasses("com.shanebeestudios.nms.addon.elements");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        PLUGIN_INSTANCE = this;
+        PluginManager pluginManager = Bukkit.getPluginManager();
+
+        // Only load addon if Skript and SkBee are present
+        if (pluginManager.getPlugin("Skript") != null && pluginManager.getPlugin("SkBee") != null) {
+            Utils.log("Loading Skript Addon.");
+            if (Skript.isAcceptRegistrations()) {
+                SkriptAddon skriptAddon = Skript.registerAddon(this);
+                try {
+                    skriptAddon.loadClasses("com.shanebeestudios.nms.addon.elements");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                Utils.error("Skript is no longer accepting registration, addon not loading!");
             }
+        } else {
+            Utils.error("'Skript' and/or 'SkBee' missing, Skript addon not loading!");
         }
     }
 
@@ -28,7 +42,7 @@ public class SkNMS extends JavaPlugin {
     }
 
     public static SkNMS getInstance() {
-        return instance;
+        return PLUGIN_INSTANCE;
     }
 
 }

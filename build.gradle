@@ -50,6 +50,7 @@ build {
 
 processResources {
     filter ReplaceTokens, tokens: ["version": projectVersion]
+    filter ReplaceTokens, tokens: ["minecraft": minecraftVersion]
 }
 
 // Run task to build jar to another spot
