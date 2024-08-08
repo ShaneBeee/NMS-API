@@ -8,6 +8,7 @@ import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.Ent
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Mth;
@@ -181,8 +182,8 @@ public class FakePlayer {
         ServerGamePacketListenerImpl connection = serverPlayer.connection;
         connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER), this.fakePlayerEntry));
         connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED), this.fakePlayerEntry));
-        assert serverPlayer.tracker != null;
-        connection.send(this.fakeServerPlayer.getAddEntityPacket(serverPlayer.tracker.serverEntity));
+        ChunkMap.TrackedEntity trackedEntity = serverPlayer.serverLevel().getChunkSource().chunkMap.entityMap.get(serverPlayer.getId());
+        connection.send(this.fakeServerPlayer.getAddEntityPacket(trackedEntity.serverEntity));
     }
 
     /**
