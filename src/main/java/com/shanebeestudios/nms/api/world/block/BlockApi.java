@@ -44,8 +44,24 @@ public class BlockApi {
      */
     @Nullable
     public static Pair<Location, BlockData> getForPlacement(@NotNull Player player, int maxDistance) {
+        return getForPlacement(player, maxDistance, player.getInventory().getItemInMainHand());
+    }
+
+    /**
+     * Get the BlockData that would be placed at a specific
+     * position as well as the location of the placement
+     *
+     * @param player      Player that would be placing
+     * @param maxDistance Max distance to check for
+     * @param itemStack   ItemStack to check for BlockData
+     * @return Pair of location and block data
+     */
+    @Nullable
+    public static Pair<Location, BlockData> getForPlacement(@NotNull Player player, int maxDistance, ItemStack itemStack) {
         ServerPlayer serverPlayer = McUtils.getServerPlayer(player);
-        net.minecraft.world.item.ItemStack handItem = serverPlayer.getMainHandItem();
+        if (itemStack == null) return null;
+        
+        net.minecraft.world.item.ItemStack handItem = ItemApi.getNMSItemStack(itemStack);
         if (handItem.getItem() instanceof BlockItem blockItem) {
             //pick range = (survival=4.5,creative=5), UNSURE = 1, fluid = false
             BlockHitResult blockHitResult = (BlockHitResult) serverPlayer.pick(maxDistance, 1, false);
@@ -70,6 +86,21 @@ public class BlockApi {
     @Nullable
     public static BlockData getBlockDataForPlacement(@NotNull Player player, int maxDistance) {
         Pair<Location, BlockData> forPlacement = getForPlacement(player, maxDistance);
+        if (forPlacement != null) return forPlacement.getSecond();
+        return null;
+    }
+
+    /**
+     * Get the BlockData that would be placed at a specific position
+     *
+     * @param player      Player that would be placing
+     * @param maxDistance Max distance to check for
+     * @param itemStack   ItemStack to check
+     * @return BlockData of what would be placed
+     */
+    @Nullable
+    public static BlockData getBlockDataForPlacement(@NotNull Player player, int maxDistance, ItemStack itemStack) {
+        Pair<Location, BlockData> forPlacement = getForPlacement(player, maxDistance, itemStack);
         if (forPlacement != null) return forPlacement.getSecond();
         return null;
     }
@@ -141,7 +172,9 @@ public class BlockApi {
      * @param player      Player to check for progress
      * @param bukkitBlock Block to check for progress
      * @return Destroy progress of block by player
+     * @deprecated Doesn't return what I thought it did (actually returns break speed)
      */
+    @Deprecated(forRemoval = true,since = "1.7.1")
     public static float getDestroyProgress(Player player, Block bukkitBlock) {
         BlockState state = McUtils.getBlockStateFromBlock(bukkitBlock);
         Pair<ServerLevel, BlockPos> levelPos = McUtils.getLevelPos(bukkitBlock.getLocation());
