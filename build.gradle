@@ -49,9 +49,10 @@ tasks.register('server', Copy) {
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId 'com.shanebeestudios'
+            groupId 'com.github.ShaneBeee'
             artifactId 'NMS-API'
             version projectVersion
+            artifact jar
         }
     }
 }
