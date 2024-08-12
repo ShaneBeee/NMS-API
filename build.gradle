@@ -58,7 +58,7 @@ publishing {
 }
 
 javadoc {
-    destinationDir = file("${buildDir}/javadoc")
+    destinationDir = file("${projectDir}/build/javadoc")
     options {
         links("https://jd.papermc.io/paper/" + javaDocVersion)
         title("NMS-API - ${projectVersion}")
