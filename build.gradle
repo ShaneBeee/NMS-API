@@ -5,13 +5,13 @@ plugins {
 }
 
 // The Minecraft version we're currently building for
-def minecraftVersion = '1.21'
+def minecraftVersion = '1.21.1'
 // The Paper JavaDoc version to use
 def javaDocVersion = '1.21'
 // Where this builds on the server
-def serverLocation = '1-21'
+def serverLocation = '1-21-1'
 // Version of NMS-API
-def projectVersion = '1.7.1'
+def projectVersion = '1.7.2'
 
 compileJava {
     sourceCompatibility = '21'
