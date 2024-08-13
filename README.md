@@ -12,7 +12,7 @@ Check out the [**JavaDocs**](https://shanebeee.github.io/docs/NMS-API/)
 Currently this library will only supported limited versions of Minecraft.
 
 ### Current:
-- Minecraft 1.21 - [**NMS-API 1.7.1**](https://github.com/ShaneBeee/NMS-API/releases/tag/1.7.1)
+- Minecraft 1.21/1.21.1 - [**NMS-API 1.7.2**](https://github.com/ShaneBeee/NMS-API/releases/tag/1.7.2)
 
 ### Outdated:
 - Minecraft 1.20.6 - [**NMS-API 1.7.0**](https://github.com/ShaneBeee/NMS-API/releases/tag/1.7.0)
