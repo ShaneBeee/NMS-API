@@ -1,6 +1,7 @@
 package com.shanebeestudios.nms.api.world.entity;
 
 import com.shanebeestudios.nms.api.util.McUtils;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
@@ -47,7 +48,7 @@ public class FakePlayer {
         if (attachedEntity != null) serverPlayer.setId(attachedEntity.getId());
         this.fakeServerPlayer = serverPlayer;
         this.fakePlayerEntry = new Entry(this.fakeServerPlayer.getUUID(), this.fakeServerPlayer.getGameProfile(), true, 0,
-            GameType.CREATIVE, this.fakeServerPlayer.getDisplayName(), null);
+            GameType.CREATIVE, this.fakeServerPlayer.getDisplayName(), true, /*Is 0 what we want?*/ 0,null);
         this.id = serverPlayer.getId();
         this.attachedEntity = attachedEntity;
     }
@@ -183,7 +184,9 @@ public class FakePlayer {
         connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER), this.fakePlayerEntry));
         connection.send(new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED), this.fakePlayerEntry));
         ChunkMap.TrackedEntity trackedEntity = serverPlayer.serverLevel().getChunkSource().chunkMap.entityMap.get(serverPlayer.getId());
-        connection.send(this.fakeServerPlayer.getAddEntityPacket(trackedEntity.serverEntity));
+
+        ClientboundAddEntityPacket addEntityPacket = new ClientboundAddEntityPacket(this.fakeServerPlayer, 0, this.fakeServerPlayer.blockPosition());
+        connection.send(addEntityPacket);
     }
 
     /**

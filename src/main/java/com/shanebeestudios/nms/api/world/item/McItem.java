@@ -1,9 +1,9 @@
 package com.shanebeestudios.nms.api.world.item;
 
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.TieredItem;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.item.component.DamageResistant;
 
 /**
  * Wrapper for Minecraft Item
@@ -38,32 +38,27 @@ public class McItem {
     }
 
     /**
-     * Get the {@link McTier Tier} from a Tiered Item
-     *
-     * @return Tier of Item
-     */
-    @Nullable
-    public McTier getTier() {
-        if (this.item instanceof TieredItem tieredItem) return McTier.wrap(tieredItem);
-        return null;
-    }
-
-    /**
      * Check if this item is fire-resistant
      *
      * @return True if fire-resistant else false
      */
     public boolean isFireResistant() {
-        return this.item.components().has(DataComponents.FIRE_RESISTANT);
+        if (this.item.components().has(DataComponents.DAMAGE_RESISTANT)) {
+            DamageResistant data = this.item.components().get(DataComponents.DAMAGE_RESISTANT);
+            return data != null && data.types() == DamageTypeTags.IS_FIRE;
+        }
+        return false;
     }
 
     /**
      * Check if Item is complex
      *
      * @return True if complex else false
+     * @deprecated No longer a thing in MC
      */
+    @Deprecated(since = "1.21.4")
     public boolean isComplex() {
-        return this.item.isComplex();
+        return false;
     }
 
 }

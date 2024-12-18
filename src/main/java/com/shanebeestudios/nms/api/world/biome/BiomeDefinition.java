@@ -4,17 +4,14 @@ import com.shanebeestudios.nms.api.util.McUtils;
 import com.shanebeestudios.nms.api.util.ReflectionUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.BiomeSpecialEffects.GrassColorModifier;
 import net.minecraft.world.level.biome.MobSpawnSettings;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.NamespacedKey;
 
@@ -120,19 +117,17 @@ public class BiomeDefinition {
         this.biomeBuilder.generationSettings((new BiomeGenerationSettings.PlainBuilder()).build());
         this.biomeBuilder.mobSpawnSettings((new MobSpawnSettings.Builder()).build());
         Biome biome = this.biomeBuilder.build();
-        DedicatedServer minecraftServer = McUtils.getMinecraftServer(Bukkit.getServer());
-        RegistryAccess.Frozen registryAccess = minecraftServer.registryAccess();
-        Registry<Biome> biomeRegistry = registryAccess.registry(Registries.BIOME).orElseThrow();
+        Registry<Biome> biomeRegistry = McUtils.getRegistry(Registries.BIOME);
         ReflectionUtils.setField("frozen", biomeRegistry, false);
         ReflectionUtils.setField("unregisteredIntrusiveHolders", biomeRegistry, new IdentityHashMap<>());
         Holder.Reference<Biome> holder = biomeRegistry.createIntrusiveHolder(biome);
         ResourceKey<Biome> resourceKey = ResourceKey.create(Registries.BIOME, this.key);
-        Registry.register(biomeRegistry, resourceKey, (Biome)holder.value());
+        Registry.register(biomeRegistry, resourceKey, (Biome) holder.value());
         biomeRegistry.freeze();
         return biome;
     }
 
-    public static enum GrassModifier {
+    public enum GrassModifier {
         NONE(GrassColorModifier.NONE),
         DARK_FOREST(GrassColorModifier.DARK_FOREST),
         SWAMP(GrassColorModifier.SWAMP);
