@@ -11,7 +11,7 @@ def javaDocVersion = '1.21.4'
 // Where this builds on the server
 def serverLocation = '1-21-4'
 // Version of NMS-API
-def projectVersion = '1.7.2'
+def projectVersion = '1.7.3'
 
 compileJava {
     sourceCompatibility = '21'
