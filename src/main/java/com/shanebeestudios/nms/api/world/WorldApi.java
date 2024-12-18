@@ -86,7 +86,7 @@ public class WorldApi {
 
         LevelChunk chunk = serverLevel.getChunkAt(new BlockPos(x, y, z));
         chunk.setBiome(x >> 2, y >> 2, z >> 2, biome);
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
     }
 
     /**
@@ -136,7 +136,7 @@ public class WorldApi {
         for (ChunkAccess chunkAccess : chunkAccessList) {
             chunkAccess.fillBiomesFromNoise(McUtils.getBiomeResolver(new MutableInt(0), chunkAccess, box, biome,
                     biomeHolder -> replaceBiome == null || biomeHolder.is(replaceBiome)), level.getChunkSource().randomState().sampler());
-            chunkAccess.setUnsaved(true);
+            chunkAccess.markUnsaved();
         }
         level.getChunkSource().chunkMap.resendBiomesForChunks(chunkAccessList);
     }

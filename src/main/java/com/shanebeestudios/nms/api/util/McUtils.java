@@ -58,6 +58,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -207,7 +208,7 @@ public class McUtils {
      * @return Registry from key
      */
     public static <T> Registry<T> getRegistry(ResourceKey<? extends Registry<? extends T>> registry) {
-        return MinecraftServer.getServer().registryAccess().registryOrThrow(registry);
+        return MinecraftServer.getServer().registryAccess().lookupOrThrow(registry);
     }
 
     /**
@@ -240,7 +241,11 @@ public class McUtils {
     public static EntityType<?> getEntityType(org.bukkit.entity.EntityType bukkitType) {
         NamespacedKey key = bukkitType.getKey();
         ResourceLocation resourceLocation = McUtils.getResourceLocation(key);
-        return BuiltInRegistries.ENTITY_TYPE.get(resourceLocation);
+        Optional<Holder.Reference<EntityType<?>>> ref = BuiltInRegistries.ENTITY_TYPE.get(resourceLocation);
+        if (ref.isEmpty()) {
+            throw new IllegalArgumentException("Unknown entity type " + resourceLocation);
+        }
+        return ref.get().value();
     }
 
     /**
@@ -290,7 +295,7 @@ public class McUtils {
         ResourceLocation resourceLocation = McUtils.getResourceLocation(key);
         ResourceKey<T> resourceKey = ResourceKey.create(registry.key(), resourceLocation);
         try {
-            return registry.getHolderOrThrow(resourceKey);
+            return registry.getOrThrow(resourceKey);
         } catch (IllegalStateException ignore) {
             return null;
         }

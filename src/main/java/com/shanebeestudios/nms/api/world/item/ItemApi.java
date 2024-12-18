@@ -6,13 +6,11 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Api methods pertaining to an {@link org.bukkit.inventory.ItemStack}
@@ -89,18 +87,6 @@ public class ItemApi {
     @NotNull
     public static Item getItem(@NotNull Material bukkitMaterial) {
         return CraftMagicNumbers.getItem(bukkitMaterial);
-    }
-
-    /**
-     * Get the {@link McTier Tier} from a Tiered Item
-     *
-     * @param item Tiered Item to get Tier from
-     * @return Tier of Item
-     */
-    @Nullable
-    public static McTier getTier(@NotNull Item item) {
-        if (item instanceof TieredItem tieredItem) return McTier.wrap(tieredItem);
-        return null;
     }
 
     /**

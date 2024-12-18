@@ -48,7 +48,7 @@ public class FakePlayer {
         if (attachedEntity != null) serverPlayer.setId(attachedEntity.getId());
         this.fakeServerPlayer = serverPlayer;
         this.fakePlayerEntry = new Entry(this.fakeServerPlayer.getUUID(), this.fakeServerPlayer.getGameProfile(), true, 0,
-            GameType.CREATIVE, this.fakeServerPlayer.getDisplayName(), null);
+            GameType.CREATIVE, this.fakeServerPlayer.getDisplayName(), true, /*Is 0 what we want?*/ 0,null);
         this.id = serverPlayer.getId();
         this.attachedEntity = attachedEntity;
     }
